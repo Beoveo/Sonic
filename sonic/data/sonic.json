@@ -1,0 +1,6 @@
+{
+	"sonicR":{"sx": 0, "sy": 0, "tileW": 35, "tileH": 38, "frames": 7 },
+	"sonicL":{"sx": 455, "sy": 0, "tileW": 35, "tileH": 38, "frames": 7},
+	"sonicJump":{"sx": 0, "sy": 0, "tileW": 35, "tileH": 38, "frames": 6}
+
+}

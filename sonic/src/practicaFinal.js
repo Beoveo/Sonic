@@ -21,17 +21,18 @@ var game = function () {
 	///////////////////////////////sprites//////////////////////////////////////////////	
 
 	//CARGA DE DATOS
-	Q.load(["mario_small.png", "mario_small.json",
+	Q.load(["sonic.png", "sonic.json",
 		"mainTitle.png", "goomba.png", "goomba.json",
 		"princess.png", "bloopa.png", "bloopa.json",
 		"coin.png", "coin.json", "1up_mushroom.png",
 		"pingu.png", "pingu.json", "daemon.png",
 		"daemon.json", "shark.png", "shark.json",
-		"clown.png", "clown.json", "spring.png", "spring.json", 
+		"clown.png", "clown.json", "spring.png", "spring.json",
 		"eggman.png", "eggman.json", "bee.png", "bee.json",
 		"bullet.png", "bullet.json"], function () {
 
-			Q.compileSheets("mario_small.png", "mario_small.json");
+
+			Q.compileSheets("sonic.png", "sonic.json");
 			Q.compileSheets("goomba.png", "goomba.json");
 			Q.compileSheets("bloopa.png", "bloopa.json");
 			Q.compileSheets("coin.png", "coin.json");
@@ -48,11 +49,9 @@ var game = function () {
 
 
 
+			
 			//SPRITE SONIC
 			Q.Sprite.extend("Sonic", {
-
-
-
 				init: function (p) {
 
 					this.alive = true;
@@ -60,12 +59,12 @@ var game = function () {
 					this.oneUp = true;
 					this._super(p, {
 
-						sheet: "marioR",
-						sprite: "Mario_anim",
+						sheet: "sonicR",
+						sprite: "Sonic_anim",
 						jumpSpeed: -400,
 						speed: 300,
-						w: 32,
-						h: 32
+						w: 35,
+						h: 36
 
 					});
 
@@ -89,7 +88,7 @@ var game = function () {
 						Q.audio.stop();
 						Q.audio.play("mario-bros-mamma-mia.mp3");
 						this.gravity = 0;
-						this.stage.unfollow();
+						//this.stage.unfollow();
 						this.play("die");
 						this.del('2d, platformerControls');
 						Q.state.set("lives", 0);
@@ -170,11 +169,11 @@ var game = function () {
 			});
 
 			//SPRITE EGGMAN
-			Q.Sprite.extend("Eggman",{
+			Q.Sprite.extend("Eggman", {
 
-				init: function(p) {
+				init: function (p) {
 					this.timeFromTurn = 0;
-				
+
 					this._super(p, {
 						sheet: "eggmanL",
 						sprite: "eggman_anim",
@@ -186,8 +185,8 @@ var game = function () {
 
 					this.add('2d, aiBounce, animation');
 
-					this.on("bump.left,bump.right,bump.bottom",function(collision) {
-						if(collision.obj.isA("Sonic")) {
+					this.on("bump.left,bump.right,bump.bottom", function (collision) {
+						if (collision.obj.isA("Sonic")) {
 							collision.obj.Die();
 							//TIENE QUE PONER LAURA LO DE PUNTOS TOTALES Y ESO. QUE NO MUERAS AL TOQUE VAMOS	
 						}
@@ -206,37 +205,36 @@ var game = function () {
 						}	
 					});*/
 
-					this.on("bump.top",function(collision) {
-						if(collision.obj.isA("Sonic")) {
-							if(this.p.hits === 1){
+					this.on("bump.top", function (collision) {
+						if (collision.obj.isA("Sonic")) {
+							if (this.p.hits === 1) {
 								collision.obj.bounce();
 								//this.on("endAnim", this, "die");
 								this.DEAD();
 							}
-							else
-							{
+							else {
 								this.p.hits++;
 								this.p.vx += 100; //Subirle la velocidad porque se enfada
 								this.p.x += 40; //MOVERLE PARA QUE SE ENFADE Y CORRA MAS
 								console.log(this.p.hits);
 							}
 						}
-							
+
 					});
 					this.on("endAnim", this, "die");
 				},
 
 
-				step: function(dt) {
+				step: function (dt) {
 
-					if(this.p.vx != 0 && this.p.alive){
+					if (this.p.vx != 0 && this.p.alive) {
 						this.play("walk_left");
 					}
 				},
 
-				DEAD: function() {
+				DEAD: function () {
 					console.log("choca con mario");
-					if(this.p.alive){
+					if (this.p.alive) {
 						//console.log("choca con mario");
 						Q.audio.play("kill_enemy.mp3");
 						this.alive = false;
@@ -244,40 +242,40 @@ var game = function () {
 						//this.on("endAnim", this, "die");
 						console.log("MUERTO");
 						this.die();
-						}
-					},
+					}
+				},
 
-				die: function(){
+				die: function () {
 					this.destroy();
 				},
 
-				goRight: function(){
-					if(this.timeFromTurn > 1){	
+				goRight: function () {
+					if (this.timeFromTurn > 1) {
 						this.timeFromTurn = 0;
-					this.p.vx = col.impact;
-					if(this.p.defaultDirection === 'left') {
-						this.p.flip = 'x';
-					}
-					else 
-						this.p.flip = false;
+						this.p.vx = col.impact;
+						if (this.p.defaultDirection === 'left') {
+							this.p.flip = 'x';
+						}
+						else
+							this.p.flip = false;
 					}
 				},
-				goLeft: function(col) {
-				if(this.timeFromTurn > 1){	
-					this.timeFromTurn= 0;
-					this.p.vx = -col.impact;
-					if(this.p.defaultDirection === 'right') {
-						this.p.flip = 'x';
+				goLeft: function (col) {
+					if (this.timeFromTurn > 1) {
+						this.timeFromTurn = 0;
+						this.p.vx = -col.impact;
+						if (this.p.defaultDirection === 'right') {
+							this.p.flip = 'x';
 						}
-					else {
-						this.p.flip = false;
+						else {
+							this.p.flip = false;
 						}
 					}
 				}
-				
+
 				// Listen for a sprite collision, if it's the player,
 				// end the game unless the enemy is hit on top
-			
+
 			});
 
 
@@ -503,8 +501,8 @@ var game = function () {
 			});
 
 			//SPRITE BEE
-			Q.Sprite.extend("Bee",{
-				init: function(p) {
+			Q.Sprite.extend("Bee", {
+				init: function (p) {
 
 					this._super(p, {
 						sheet: "bee",
@@ -518,25 +516,26 @@ var game = function () {
 					this.add('2d, aiBounce, animation, DefaultEnemy');
 				},
 
-				step: function(dt) {
-					if(this.alive){
-						if(this.p.x > 900){
+				step: function (dt) {
+					if (this.alive) {
+						if (this.p.x > 900) {
 							this.p.vx = -this.p.vx;
 
-						}else if(this.p.x < 550){
+						} else if (this.p.x < 550) {
 							this.p.vx = +this.p.vx;
 						}
 
 
 						var that = this;
-						setInterval(function(){ 
-							that.shoot(); }, 5000);			
+						setInterval(function () {
+							that.shoot();
+						}, 5000);
 
 						this.play("standing");
-						if(this.p.vx == 0)
+						if (this.p.vx == 0)
 							this.p.vx = 200;
 
-						
+
 						/*var that = this;
 						setInterval(function(){ 
 							that.shoot(); }, 10000);*/
@@ -548,13 +547,13 @@ var game = function () {
 				 * y un poco por encima del objeto "Player".
 				 * vy es la velocidad de "Bullet" sobre el eje Y.
 				 */
-				shoot: function() {
+				shoot: function () {
 					this.stage.insert(new Q.Bullet({
 						x: this.p.x,
-						y: this.p.y + this.p.w/2
+						y: this.p.y + this.p.w / 2
 					}))
 				}
-			
+
 			});
 
 
@@ -567,7 +566,7 @@ var game = function () {
 			 * - "sensor: true" porque quiero definir mi propio comportamiento de colisiones.
 			 */
 			Q.Sprite.extend("Bullet", {
-				init: function(p) {
+				init: function (p) {
 					this._super(p, {
 						sheet: "bullet",
 						sprite: "Bullet_anim",
@@ -579,16 +578,16 @@ var game = function () {
 					 */
 					this.add("animation, tween");
 
-					this.on("hit.sprite",function(collision) {
-						if(collision.obj.isA("Sonic")) {
+					this.on("hit.sprite", function (collision) {
+						if (collision.obj.isA("Sonic")) {
 							collision.obj.isA("Sonic").destroy();
 							this.destroy();
 						}
 					});
 				},
-				step: function(dt){
+				step: function (dt) {
 					this.play("fire");
-					this.animate({y: this.p.y+50 }, 10, Q.Easing.Linear, {callback: this.destroy});
+					this.animate({ y: this.p.y + 50 }, 10, Q.Easing.Linear, { callback: this.destroy });
 				}
 			});
 
@@ -606,15 +605,15 @@ var game = function () {
 
 					this.add('2d, animation, tween');
 					// Write event handlers to respond hook into behaviors
-					
+
 					this.on("bump.top", function (collision) {
 						if (collision.obj.isA("Sonic")) {
 							collision.obj.p.vy = -700;
 							this.play("bounce");
 						}
 					});
-			
-					
+
+
 				},
 
 			});
@@ -696,7 +695,7 @@ var game = function () {
 					this.entity.on("bump.left,bump.right,bump.bottom", function (collision) {
 						if (collision.obj.isA("Sonic")) {
 
-							if (Q.state.get("score") < 50) {
+							if (Q.state.get("score") <= 0) {
 								if (Q.state.get("lives") > 1) {
 									Q.state.dec("lives", 1);
 									Q.stageScene("livesLeft", 1);
@@ -707,12 +706,13 @@ var game = function () {
 								}
 							}
 							else {
-								if (Q.state.get("score") > 50) {
+								Q.state.set("score", 0);
+								/*if (Q.state.get("score") > 50) {
 									Q.state.dec("score", 50);
 								}
 								else {
 									Q.state.set("score", 0);
-								}
+								}*/
 								collision.obj.bounce();
 								collision.obj.p.vx = -300;
 							}
@@ -752,23 +752,24 @@ var game = function () {
 
 
 			////////////////////////////////////ANIMACIONES/////////////////////////////////////////////////////
+			
 			//Animaciones Sonic
-			Q.animations('Mario_anim', {
-				run_right: { frames: [1, 2, 3], rate: 1 / 10 },
-				run_left: { frames: [17, 16, 15], rate: 1 / 10 },
+			Q.animations('Sonic_anim', {
+				run_right: { frames: [1, 2, 3, 4, 5, 6], rate: 1 / 10 },
+				run_left: { frames: [19, 18, 17, 16, 15, 14], rate: 1 / 10 },
 				Stand_right: { frames: [0] },
-				Stand_left: { frames: [14] },
-				fall_right: { frames: [4], loop: false },
-				fall_left: { frames: [18], loop: false },
+				Stand_left: { frames: [13] },
+				fall_right: { frames: [7, 8, 9, 10, 11, 12], rate: 1/10/* loop: true */},
+				fall_left: { frames: [20, 21, 22, 23, 24, 25], rate: 1/10, loop: false },
 				die: { frames: [12], loop: true }
 			});
 
-			
+
 			//Animaciones Bowser
 			Q.animations('eggman_anim', {
-				stand_left: { frames: [0], rate: 1/3}, 
-				walk_left: {frames: [1, 2, 3, 4], rate: 1/4},
-				die: {frames: [5,6,7],rate: 1/150, loop: false, trigger: "endAnim"}
+				stand_left: { frames: [0], rate: 1 / 3 },
+				walk_left: { frames: [1, 2, 3, 4], rate: 1 / 4 },
+				die: { frames: [5, 6, 7], rate: 1 / 150, loop: false, trigger: "endAnim" }
 			});
 
 			//Animaciones Goomba
@@ -805,17 +806,17 @@ var game = function () {
 			});
 
 			Q.animations("Bee_anim", {
-				standing: { frames: [0,1,2,3,4,5,6,7], rate: 1/3, loop: false }
+				standing: { frames: [0, 1, 2, 3, 4, 5, 6, 7], rate: 1 / 3, loop: false }
 			});
-		
+
 			Q.animations("Bullet_anim", {
-				fire: { frames: [0,1], rate: 1/3, loop: true }
+				fire: { frames: [0, 1], rate: 1 / 3, loop: true }
 			});
-		
+
 			//Animación Spring
 			Q.animations("spring_anim", {
 				bounce: {
-					frames: [1, 2, 3, 0], rate: 2/15,
+					frames: [1, 2, 3, 0], rate: 2 / 15,
 					flip: false, loop: false
 				}
 			});
@@ -849,8 +850,8 @@ var game = function () {
 				//stage.insert(new Q.Coin({x: 300, y: 400}));
 
 				//stage.insert(new Q.Spring({x: 350, y:550}));
-				stage.insert(new Q.Eggman({x: 350, y:550}));
-				stage.insert(new Q.Bee({x: 560,y: 350}));
+				stage.insert(new Q.Eggman({ x: 350, y: 550 }));
+				stage.insert(new Q.Bee({ x: 560, y: 350 }));
 				//stage.insert(new Q.Coin({x: 350, y: 250}));
 				//stage.insert(new Q.Coin({x: 370, y: 400}));
 				//stage.insert(new Q.Coin({x: 425, y: 400}));
@@ -962,7 +963,7 @@ var game = function () {
 		Q.state.reset({ score: 0, lives: life });
 		Q.stageScene('level1');
 		Q.stageScene("hud", 3);
-		
+
 	});
 
 	/////////////////////////////////PARTES DEL HUD////////////////////////////////////////////////
