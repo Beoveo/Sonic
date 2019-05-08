@@ -1,0 +1,4 @@
+{
+    "spring":{"sx":0,"sy":0,"tileW":28,"tileH":33,"frames":1},
+    "springBounce":{"sx":29,"sy":0,"tileW":28,"tileH":33,"frames":3}
+}
