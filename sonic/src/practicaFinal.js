@@ -27,7 +27,9 @@ var game = function () {
 		"coin.png", "coin.json", "1up_mushroom.png",
 		"pingu.png", "pingu.json", "daemon.png",
 		"daemon.json", "shark.png", "shark.json",
-		"clown.png", "clown.json", "spring.png", "spring.json", "eggman.png", "eggman.json"], function () {
+		"clown.png", "clown.json", "spring.png", "spring.json", 
+		"eggman.png", "eggman.json", "bee.png", "bee.json",
+		"bullet.png", "bullet.json"], function () {
 
 			Q.compileSheets("mario_small.png", "mario_small.json");
 			Q.compileSheets("goomba.png", "goomba.json");
@@ -39,6 +41,9 @@ var game = function () {
 			Q.compileSheets("shark.png", "shark.json");
 			Q.compileSheets("clown.png", "clown.json");
 			Q.compileSheets("eggman.png", "eggman.json");
+			Q.compileSheets("bee.png", "bee.json");
+			Q.compileSheets("bullet.png", "bullet.json");
+
 
 
 
@@ -497,6 +502,96 @@ var game = function () {
 
 			});
 
+			//SPRITE BEE
+			Q.Sprite.extend("Bee",{
+				init: function(p) {
+
+					this._super(p, {
+						sheet: "bee",
+						sprite: "Bee_anim",
+						x: 350,
+						y: 350,
+						gravity: 0 //Asi va en horizontal por el cielo
+
+					});
+
+					this.add('2d, aiBounce, animation, DefaultEnemy');
+				},
+
+				step: function(dt) {
+					if(this.alive){
+						if(this.p.x > 900){
+							this.p.vx = -this.p.vx;
+
+						}else if(this.p.x < 550){
+							this.p.vx = +this.p.vx;
+						}
+
+
+						var that = this;
+						setInterval(function(){ 
+							that.shoot(); }, 5000);			
+
+						this.play("standing");
+						if(this.p.vx == 0)
+							this.p.vx = 200;
+
+						
+						/*var that = this;
+						setInterval(function(){ 
+							that.shoot(); }, 10000);*/
+					}
+				},
+				/**
+				 * Este método va a crear un nuevo objeto "Bullet".
+				 * La posición del nuevo "Bullet" tiene que ser el mismo x que el jugador
+				 * y un poco por encima del objeto "Player".
+				 * vy es la velocidad de "Bullet" sobre el eje Y.
+				 */
+				shoot: function() {
+					this.stage.insert(new Q.Bullet({
+						x: this.p.x,
+						y: this.p.y + this.p.w/2
+					}))
+				}
+			
+			});
+
+
+			/**
+			 * Voy a crear un nuevo objeto "Bullet" extendiendo "MovingSprite".
+			 * Las propiedades por defecto son:
+			 * - Utilizar el sprite "bullet".
+			 * - El tipo es SPRITE_BULLET. 
+			 * - Colisiona con SPRITE_ENEMY.
+			 * - "sensor: true" porque quiero definir mi propio comportamiento de colisiones.
+			 */
+			Q.Sprite.extend("Bullet", {
+				init: function(p) {
+					this._super(p, {
+						sheet: "bullet",
+						sprite: "Bullet_anim",
+						//sensor: true,
+					});
+
+					/**
+					 * Añadiendo el componente 2d para activar la detección de colisiones y el movimiento.
+					 */
+					this.add("animation, tween");
+
+					this.on("hit.sprite",function(collision) {
+						if(collision.obj.isA("Sonic")) {
+							collision.obj.isA("Sonic").destroy();
+							this.destroy();
+						}
+					});
+				},
+				step: function(dt){
+					this.play("fire");
+					this.animate({y: this.p.y+50 }, 10, Q.Easing.Linear, {callback: this.destroy});
+				}
+			});
+
 
 			// SPRING SPRITE
 			Q.Sprite.extend("Spring", {
@@ -709,6 +804,14 @@ var game = function () {
 				run: { frames: [0, 1, 2, 3], rate: 0.5 / 3, loop: false }
 			});
 
+			Q.animations("Bee_anim", {
+				standing: { frames: [0,1,2,3,4,5,6,7], rate: 1/3, loop: false }
+			});
+		
+			Q.animations("Bullet_anim", {
+				fire: { frames: [0,1], rate: 1/3, loop: true }
+			});
+		
 			//Animación Spring
 			Q.animations("spring_anim", {
 				bounce: {
@@ -747,7 +850,7 @@ var game = function () {
 
 				//stage.insert(new Q.Spring({x: 350, y:550}));
 				stage.insert(new Q.Eggman({x: 350, y:550}));
-
+				stage.insert(new Q.Bee({x: 560,y: 350}));
 				//stage.insert(new Q.Coin({x: 350, y: 250}));
 				//stage.insert(new Q.Coin({x: 370, y: 400}));
 				//stage.insert(new Q.Coin({x: 425, y: 400}));
