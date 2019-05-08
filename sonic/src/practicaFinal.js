@@ -27,7 +27,7 @@ var game = function () {
 		"coin.png", "coin.json", "1up_mushroom.png",
 		"pingu.png", "pingu.json", "daemon.png",
 		"daemon.json", "shark.png", "shark.json",
-		"clown.png", "clown.json", "spring.png", "spring.json"], function () {
+		"clown.png", "clown.json", "spring.png", "spring.json", "eggman.png", "eggman.json"], function () {
 
 			Q.compileSheets("mario_small.png", "mario_small.json");
 			Q.compileSheets("goomba.png", "goomba.json");
@@ -38,6 +38,8 @@ var game = function () {
 			Q.compileSheets("daemon.png", "daemon.json");
 			Q.compileSheets("shark.png", "shark.json");
 			Q.compileSheets("clown.png", "clown.json");
+			Q.compileSheets("eggman.png", "eggman.json");
+
 
 
 
@@ -161,6 +163,120 @@ var game = function () {
 				}
 
 			});
+
+			//SPRITE EGGMAN
+			Q.Sprite.extend("Eggman",{
+
+				init: function(p) {
+					this.timeFromTurn = 0;
+				
+					this._super(p, {
+						sheet: "eggmanL",
+						sprite: "eggman_anim",
+						hits: 0,
+						alive: true,
+						vx: 50,
+						//collisionMask: Q.SPRITE_FRIENDLY | Q.SPRITE_ACTIVE | Q.SPRITE_DEFAULT
+					});
+
+					this.add('2d, aiBounce, animation');
+
+					this.on("bump.left,bump.right,bump.bottom",function(collision) {
+						if(collision.obj.isA("Sonic")) {
+							collision.obj.Die();
+							//TIENE QUE PONER LAURA LO DE PUNTOS TOTALES Y ESO. QUE NO MUERAS AL TOQUE VAMOS	
+						}
+					});
+					/*
+					INTENTAR QUE HAGA EL FLIP
+					this.on("hit",function(collision){
+						console.log("choca");
+						var floor = Q("Floor");
+						if(collision.obj.isA("floor")){
+							collision.impact = this.p.vx;
+							if(this.p.defaultDirection == "left")
+								this.goRight(collision);
+							else
+								this.goLeft(collision);
+						}	
+					});*/
+
+					this.on("bump.top",function(collision) {
+						if(collision.obj.isA("Sonic")) {
+							if(this.p.hits === 1){
+								collision.obj.bounce();
+								//this.on("endAnim", this, "die");
+								this.DEAD();
+							}
+							else
+							{
+								this.p.hits++;
+								this.p.vx += 100; //Subirle la velocidad porque se enfada
+								this.p.x += 40; //MOVERLE PARA QUE SE ENFADE Y CORRA MAS
+								console.log(this.p.hits);
+							}
+						}
+							
+					});
+					this.on("endAnim", this, "die");
+				},
+
+
+				step: function(dt) {
+
+					if(this.p.vx != 0 && this.p.alive){
+						this.play("walk_left");
+					}
+				},
+
+				DEAD: function() {
+					console.log("choca con mario");
+					if(this.p.alive){
+						//console.log("choca con mario");
+						Q.audio.play("kill_enemy.mp3");
+						this.alive = false;
+						Q.state.inc("score", 100);
+						//this.on("endAnim", this, "die");
+						console.log("MUERTO");
+						this.die();
+						}
+					},
+
+				die: function(){
+					this.destroy();
+				},
+
+				goRight: function(){
+					if(this.timeFromTurn > 1){	
+						this.timeFromTurn = 0;
+					this.p.vx = col.impact;
+					if(this.p.defaultDirection === 'left') {
+						this.p.flip = 'x';
+					}
+					else 
+						this.p.flip = false;
+					}
+				},
+				goLeft: function(col) {
+				if(this.timeFromTurn > 1){	
+					this.timeFromTurn= 0;
+					this.p.vx = -col.impact;
+					if(this.p.defaultDirection === 'right') {
+						this.p.flip = 'x';
+						}
+					else {
+						this.p.flip = false;
+						}
+					}
+				}
+				
+				// Listen for a sprite collision, if it's the player,
+				// end the game unless the enemy is hit on top
+			
+			});
+
+
+
 
 			//SPRITE GOOMBA
 			Q.Sprite.extend("Goomba", {
@@ -552,15 +668,12 @@ var game = function () {
 				die: { frames: [12], loop: true }
 			});
 
+			
 			//Animaciones Bowser
-			Q.animations('Bowser_anim', {
-				run_right: { frames: [1, 2, 3, 4, 5], rate: 1 / 10 },
-				run_left: { frames: [10, 9, 8, 7, 6], rate: 1 / 10 },
-				Stand_right: { frames: [0] },
-				Stand_left: { frames: [11] },
-				fall_right: { frames: [4], loop: false },
-				fall_left: { frames: [18], loop: false },
-				die: { frames: [12], loop: true }
+			Q.animations('eggman_anim', {
+				stand_left: { frames: [0], rate: 1/3}, 
+				walk_left: {frames: [1, 2, 3, 4], rate: 1/4},
+				die: {frames: [5,6,7],rate: 1/150, loop: false, trigger: "endAnim"}
 			});
 
 			//Animaciones Goomba
@@ -628,16 +741,17 @@ var game = function () {
 
 				var player = stage.insert(new Q.Sonic({ x: 150, y: 380 }));
 
-				stage.insert(new Q.Coin({x: 200, y: 400}));
-				stage.insert(new Q.Coin({x: 250, y: 400}));
-				stage.insert(new Q.Coin({x: 300, y: 400}));
+				//stage.insert(new Q.Coin({x: 200, y: 400}));
+				//stage.insert(new Q.Coin({x: 250, y: 400}));
+				//stage.insert(new Q.Coin({x: 300, y: 400}));
 
-				stage.insert(new Q.Spring({x: 350, y:550}));
+				//stage.insert(new Q.Spring({x: 350, y:550}));
+				stage.insert(new Q.Eggman({x: 350, y:550}));
 
-				stage.insert(new Q.Coin({x: 350, y: 250}));
-				stage.insert(new Q.Coin({x: 370, y: 400}));
-				stage.insert(new Q.Coin({x: 425, y: 400}));
-				stage.insert(new Q.Coin({x: 480, y: 400}));
+				//stage.insert(new Q.Coin({x: 350, y: 250}));
+				//stage.insert(new Q.Coin({x: 370, y: 400}));
+				//stage.insert(new Q.Coin({x: 425, y: 400}));
+				//stage.insert(new Q.Coin({x: 480, y: 400}));
 
 
 				stage.insert(new Q.Pingu({ x: 1460, y: 350 }));

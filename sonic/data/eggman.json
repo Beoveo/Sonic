@@ -1,0 +1,6 @@
+{
+	"eggmanL":{"sx":0,"sy":0,"tileW":73,"tileH":77,"frames":2},
+	"eggmanWalk":{"sx":73,"sy":0,"tileW":73,"tileH":77,"frames":4},
+	"eggmanDie":{"sx":292,"sy":0,"tileW":73,"tileH":77,"frames":3},
+	"eggmanRun":{"sx":448,"sy":0,"tileW":64,"tileH":72,"frames":6}
+}
