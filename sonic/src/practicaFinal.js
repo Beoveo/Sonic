@@ -21,7 +21,8 @@ var game = function () {
 	///////////////////////////////sprites//////////////////////////////////////////////	
 
 	//CARGA DE DATOS
-	Q.load(["mario_small.png", "mario_small.json",
+	Q.load([
+		"sonic.png", "sonic.json", "mario_small.png", "mario_small.json",
 		"mainTitle.png", "goomba.png", "goomba.json",
 		"princess.png", "bloopa.png", "bloopa.json",
 		"coin.png", "coin.json", "1up_mushroom.png",
@@ -29,6 +30,7 @@ var game = function () {
 		"daemon.json", "shark.png", "shark.json",
 		"clown.png", "clown.json"], function () {
 
+			Q.compileSheets("sonic.png", "sonic.json");
 			Q.compileSheets("mario_small.png", "mario_small.json");
 			Q.compileSheets("goomba.png", "goomba.json");
 			Q.compileSheets("bloopa.png", "bloopa.json");
@@ -52,12 +54,12 @@ var game = function () {
 					this.oneUp = true;
 					this._super(p, {
 
-						sheet: "marioR",
+						sheet: "sonicR",
 						sprite: "Mario_anim",
 						jumpSpeed: -400,
 						speed: 300,
-						w: 32,
-						h: 32
+						w: 29,
+						h: 39
 
 					});
 
@@ -516,10 +518,10 @@ var game = function () {
 			////////////////////////////////////ANIMACIONES/////////////////////////////////////////////////////
 			//Animaciones Sonic
 			Q.animations('Mario_anim', {
-				run_right: { frames: [1, 2, 3], rate: 1 / 10 },
+				run_right: { frames: [1, 2, 3, 4, 5, 6], rate: 1 / 10 },
 				run_left: { frames: [17, 16, 15], rate: 1 / 10 },
 				Stand_right: { frames: [0] },
-				Stand_left: { frames: [14] },
+				Stand_left: { frames: [13] },
 				fall_right: { frames: [4], loop: false },
 				fall_left: { frames: [18], loop: false },
 				die: { frames: [12], loop: true }
