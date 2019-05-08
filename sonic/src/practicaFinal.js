@@ -27,12 +27,13 @@ var game = function () {
 		"coin.png", "coin.json", "1up_mushroom.png",
 		"pingu.png", "pingu.json", "daemon.png",
 		"daemon.json", "shark.png", "shark.json",
-		"clown.png", "clown.json"], function () {
+		"clown.png", "clown.json", "spring.png", "spring.json"], function () {
 
 			Q.compileSheets("mario_small.png", "mario_small.json");
 			Q.compileSheets("goomba.png", "goomba.json");
 			Q.compileSheets("bloopa.png", "bloopa.json");
 			Q.compileSheets("coin.png", "coin.json");
+			Q.compileSheets("spring.png", "spring.json");
 			Q.compileSheets("pingu.png", "pingu.json");
 			Q.compileSheets("daemon.png", "daemon.json");
 			Q.compileSheets("shark.png", "shark.json");
@@ -84,7 +85,7 @@ var game = function () {
 						this.stage.unfollow();
 						this.play("die");
 						this.del('2d, platformerControls');
-						Q.state.dec("lives", 2);
+						Q.state.set("lives", 0);
 						Q.stageScene("endGame", 1, { label: "You Died" });
 						this.animate({ y: this.p.y - 100 }, 0.4, Q.Easing.Linear, { callback: this.nowDown });
 					}
@@ -381,6 +382,32 @@ var game = function () {
 			});
 
 
+			// SPRING SPRITE
+			Q.Sprite.extend("Spring", {
+				init: function (p) {
+					this.touched = false;
+					this._super(p, {
+						sheet: 'spring',
+						sprite: 'spring_anim',
+						gravity: 0
+					});
+
+
+					this.add('2d, animation, tween');
+					// Write event handlers to respond hook into behaviors
+					
+					this.on("bump.top", function (collision) {
+						if (collision.obj.isA("Sonic")) {
+							collision.obj.p.vy = -700;
+							this.play("bounce");
+						}
+					});
+			
+					
+				},
+
+			});
+
 			//SPRITE COIN 
 			Q.Sprite.extend("Coin", {
 
@@ -410,7 +437,7 @@ var game = function () {
 
 				step: function (dt) {
 
-					this.play("Shine");
+					this.play("twist");
 				}
 
 			});
@@ -550,7 +577,7 @@ var game = function () {
 
 			//Animaciones Coin
 			Q.animations('Coin_anim', {
-				Shine: { frames: [0, 1, 2], rate: 1 / 3, loop: true }
+				twist: { frames: [0, 1, 2, 3], rate: 1 / 3, loop: true }
 			});
 
 			Q.animations("Pingu_anim", {
@@ -567,6 +594,14 @@ var game = function () {
 
 			Q.animations("Clown_anim", {
 				run: { frames: [0, 1, 2, 3], rate: 0.5 / 3, loop: false }
+			});
+
+			//Animación Spring
+			Q.animations("spring_anim", {
+				bounce: {
+					frames: [1, 2, 3, 0], rate: 2/15,
+					flip: false, loop: false
+				}
 			});
 
 
@@ -593,6 +628,18 @@ var game = function () {
 
 				var player = stage.insert(new Q.Sonic({ x: 150, y: 380 }));
 
+				stage.insert(new Q.Coin({x: 200, y: 400}));
+				stage.insert(new Q.Coin({x: 250, y: 400}));
+				stage.insert(new Q.Coin({x: 300, y: 400}));
+
+				stage.insert(new Q.Spring({x: 350, y:550}));
+
+				stage.insert(new Q.Coin({x: 350, y: 250}));
+				stage.insert(new Q.Coin({x: 370, y: 400}));
+				stage.insert(new Q.Coin({x: 425, y: 400}));
+				stage.insert(new Q.Coin({x: 480, y: 400}));
+
+
 				stage.insert(new Q.Pingu({ x: 1460, y: 350 }));
 				stage.insert(new Q.Clown({ x: 1000, y: 350 }));
 
@@ -601,10 +648,10 @@ var game = function () {
 
 
 				//		stage.insert(new Q.Peach({x: 2000,y: 517}));
-
-				stage.add("viewport").follow(Q("Sonic").first());
-				stage.viewport.offsetX = -100;
-				stage.viewport.offsetY = 160;
+				stage.add("viewport").centerOn(150, 360);
+				//stage.add("viewport").follow(Q("Sonic", {x: true, y: false}).first());
+				//stage.viewport.offsetX = -100;
+				//stage.viewport.offsetY = 160;
 			});
 
 
