@@ -228,58 +228,52 @@ var game = function () {
 
 					this.add('2d, aiBounce, animation, tween');
 
-					this.on("bump.left,bump.right,bump.bottom", function (collision) {
+					this.on("hit.sprite", function (collision) {
 						if (collision.obj.isA("Sonic") && !this.col) {
-							this.col = true;
-							if (Q.state.get("score") <= 0) {
-								if (Q.state.get("lives") > 1) {
-									Q.state.dec("lives", 1);
-									Q.stageScene("livesLeft", Q.state.get("lives"));
-
+							if (!collision.obj.p.bola) {
+								this.col = true;
+								if (Q.state.get("score") == 0) {
+									if (Q.state.get("lives") > 1) {
+										Q.state.dec("lives", 1);
+										Q.stageScene("livesLeft", Q.state.get("lives"));
+									}
+									else {
+										collision.obj.Die();
+									}
 								}
 								else {
-									collision.obj.Die();
+									Q.state.set("score", 0);
+									if (this.p.x > collision.obj.p.x) {
+										collision.obj.bounceLeft();
+									}
+									else {
+										collision.obj.bounceRight();
+									}
 								}
+								setTimeout(() => {
+									this.col = false;
+								}, 500);
 							}
 							else {
-								Q.state.set("score", 0);
-								this.on("bump.left, bump.bottom", function () {
-									collision.obj.bounceLeft();
-									//	collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
-								});
-								this.on("bump.right", function () {
-									collision.obj.bounceRight();
-									//	collision.obj.animate({ x: collision.obj.p.x + 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
-								});
+								this.col = true;
+								collision.obj.bounce();
+								if (this.p.hits > 1) {
+									this.DEAD();
+								}
+								else{
+									this.p.hits++;
+									var dir = 1;
+									if (this.p.vx < 0) dir = -1;
+									this.p.vx += 80 * dir;
+								}
+								setTimeout(() => {
+									this.col = false;
+								}, 500);
 							}
-							setTimeout(() => {
-								this.col = false;
-							}, 500);
 
 						}
 					});
-
-					this.on("bump.top", function (collision) {
-						if (collision.obj.isA("Sonic") && !this.col) {
-							this.col = true;
-							collision.obj.bounceLeft();
-							//collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
-							if (this.p.hits > 1) {
-								this.DEAD();
-							}
-							else {
-								this.p.hits++;
-								var dir = 1;
-								if (this.p.vx < 0) dir = -1;
-								this.p.vx += 80 * dir; //Subirle la velocidad porque se enfada
-								//this.p.x += 32; //MOVERLE PARA QUE SE ENFADE Y CORRA MAS
-							}
-							setTimeout(() => {
-								this.col = false;
-							}, 500);
-						}
-
-					});
+					
 					this.on("endAnim", this, "die");
 				},
 
@@ -522,7 +516,9 @@ var game = function () {
 					this.inity = this.p.y;
 					this.initvy = this.p.vy;
 					this.add('2d, aiBounce, animation');
-
+					this.on("hit.sprite", function (collision) {
+						this.p.vy = -this.p.vy;
+					});
 					this.on("bump.top", function (collision) {
 						if (collision.obj.isA("Sonic")) {
 							this.sonic = true;
@@ -549,27 +545,27 @@ var game = function () {
 						else this.dir = "up";
 						this.p.vy = -this.p.vy;
 					}
-					else if (this.p.vy === 0 && (this.p.y < this.inity + 150 || this.p.y > this.inity - 150)) {
+					/*else if (this.p.vy === 0 && (this.p.y < this.inity + 150 || this.p.y > this.inity - 150)) {
 						//if(!this.sonic){
 						this.p.inity = this.p.y + 150;
+						this.p.vy = -300;*/
+					//}
+					/*else if(this.dir === "up"){
 						this.p.vy = -300;
-						//}
-						/*else if(this.dir === "up"){
-							this.p.vy = -300;
-						}
-						else {
-							this.p.vy = 300;
-						}*/
-						/*
-						else if(this.dir === "up" ){
-							this.p.vy = -(150 - (this.p.y - this.inity));
-						}
-						else{
-							this.p.vy = 150 - (this.inity - this.p.y);
-						}
-						console.log(this.p.vy);*/
-
 					}
+					else {
+						this.p.vy = 300;
+					}*/
+					/*
+					else if(this.dir === "up" ){
+						this.p.vy = -(150 - (this.p.y - this.inity));
+					}
+					else{
+						this.p.vy = 150 - (this.inity - this.p.y);
+					}
+					console.log(this.p.vy);*/
+
+					//}
 					/*if (this.alive) {
 						this.play("standing");
 						if (this.p.vy == 0)
@@ -810,7 +806,7 @@ var game = function () {
 
 			////////////////////////////////////COMPONENTES////////////////////////////////////////////////////
 			//COMPONENTE ENEMIGOS
-			
+
 			//COMPONENTE ENEMIGOS
 			Q.component("DefaultEnemy", {
 				added: function () {
@@ -849,13 +845,6 @@ var game = function () {
 
 						}
 					});
-					/*
-					this.entity.on("bump.top", function (collision, that) {
-					  if (collision.obj.isA("Sonic")) {
-						collision.obj.bounce();
-						this.DEAD();
-					  }
-					});*/
 
 					this.entity.on("endAnim", this.entity, "die");
 
@@ -977,10 +966,10 @@ var game = function () {
 				//stage.insert(new Q.Coin({x: 250, y: 400}));
 				//stage.insert(new Q.Coin({x: 300, y: 400}));
 
-				stage.insert(new Q.Shark({ x: 180, y: 400 }))
+				//stage.insert(new Q.Shark({ x: 180, y: 400 }))
 
 				//stage.insert(new Q.Spring({ x: 350, y: 550 }));
-				//stage.insert(new Q.Eggman({ x: 350, y: 550 }));
+				stage.insert(new Q.Eggman({ x: 350, y: 550 }));
 				//stage.insert(new Q.Bee({ x: 250, y: 300 }));
 				//stage.insert(new Q.Coin({x: 350, y: 250}));
 				//stage.insert(new Q.Coin({x: 370, y: 400}));
@@ -1115,9 +1104,9 @@ var game = function () {
 			Q.state.on("change.score", this, "update_label");
 		},
 
-        /**
-        * Con esta función actualizo el label.
-        */
+		/**
+		* Con esta función actualizo el label.
+		*/
 		update_label: function (score) {
 			this.p.label = "SCORE: " + Q.state.get("score");
 		}
@@ -1135,9 +1124,9 @@ var game = function () {
 			Q.state.on("change.lives", this, "update_label");
 		},
 
-        /**
-        * Con esta función actualizo el label.
-        */
+		/**
+		* Con esta función actualizo el label.
+		*/
 		update_label: function (score) {
 			this.p.label = "LIVES: " + Q.state.get("lives");
 		}
@@ -1156,9 +1145,9 @@ var game = function () {
 			Q.state.on("change.time", this, "update_label");
 		},
 
-        /**
-        * Con esta función actualizo el label.
-        */
+		/**
+		* Con esta función actualizo el label.
+		*/
 		update_label: function (score) {
 			this.p.label = "TIME: " + Q.state.get("time");
 		}
