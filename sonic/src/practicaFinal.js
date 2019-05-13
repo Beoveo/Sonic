@@ -49,7 +49,7 @@ var game = function () {
 
 
 
-			
+
 			//SPRITE SONIC
 			Q.Sprite.extend("Sonic", {
 				init: function (p) {
@@ -58,14 +58,15 @@ var game = function () {
 					this.lastMileStone = 1;
 					this.oneUp = true;
 					this._super(p, {
-
 						sheet: "sonicR",
 						sprite: "Sonic_anim",
 						jumpSpeed: -400,
-						speed: 300,
-						w: 35,
-						h: 36
-
+						speed: 400,
+						vy: 0,
+						w: 33,
+						h: 40,
+						onShark: false,
+						agachado: false
 					});
 
 					this.add('2d, platformerControls, animation, tween');
@@ -99,8 +100,15 @@ var game = function () {
 				},
 
 				bounce: function () {
-
 					this.p.vy = -200;
+				},
+
+				bounceRight: function(){
+					this.animate({ x: this.p.x + 50, y: this.p.y - 32 }, 0.25, Q.Easing.Linear);
+				},
+
+				bounceLeft: function(){
+					this.animate({ x: this.p.x - 50, y: this.p.y - 32 }, 0.25, Q.Easing.Linear);
 				},
 
 				nowDown: function () {
@@ -131,41 +139,61 @@ var game = function () {
 					if (this.p.y > 520)
 						this.stage.follow(Q("Sonic").first(), { x: true, y: false });
 
-					if (this.oneUp && Q.state.get("score") / 1000 == this.lastMileStone) {
-
-						this.extralife();
-						this.oneUp = false;
-					}
-					else if (!this.oneUp) {
-						this.lastMileStone++;
-						this.oneUp = true;
-					}
-
+					
 					if (this.p.y > 620) {
 						this.fall();
 					}
 					if (!this.alive)
 						this.play("die");
-					else if (this.p.vy != 0) {
-						this.play("fall_" + this.p.direction);
-					}
-					else if (this.p.vx > 0) {
-						this.play("run_right");
-					}
-					else if (this.p.vx < 0) {
-						this.play("run_left");
-					}
-					else {
-						this.play("Stand_" + this.p.direction);
-					}
+						else if (this.p.vy != 0) {
+							this.play("jump_right");
+							this.p.speed = 400;
+							this.p.agachado = false;
+						}
+						else if(Q.inputs['down']){
+							this.p.agachado = true;
+							if(this.p.speed > 500)
+							{
+								this.play("bola");
+							}
+						}
+						//DERECHA
+						else if (this.p.vx > 0) {
+							this.p.flip = false;
+							this.p.agachado = false;
+							this.p.speed = this.p.speed + 10;
+							if(this.p.speed > 500){
+								this.play("super_speed");
+							}
+							else{
+							this.play("run_right");
+							}
+						}
+						//IZQUIERDA
+						else if (this.p.vx < 0) {
+							this.p.flip = 'x';
+							this.p.agachado = false;
+							this.p.speed = this.p.speed + 50;
+							if(this.p.speed > 1000){
+								this.play("super_speed");
+								
+							}
+							else{
+								this.play("run_right");
+							}
+						}
+						else if(this.p.vx == 0) {
+							this.p.speed = 400;
+							if(this.p.agachado)
+							{
+								this.play("tumbado");
+							}
+							else{
+								this.play("Stand_right");
+							}
+						}
 
-				},
-				extralife: function () {
-
-					Q.state.inc("lives", 1);
-					Q.audio.play("1up.mp3");
 				}
-
 			});
 
 			//SPRITE EGGMAN
@@ -173,51 +201,68 @@ var game = function () {
 
 				init: function (p) {
 					this.timeFromTurn = 0;
-
+					this.col = false;
+					this.alive = true;
 					this._super(p, {
 						sheet: "eggmanL",
 						sprite: "eggman_anim",
 						hits: 0,
-						alive: true,
 						vx: 50,
 						//collisionMask: Q.SPRITE_FRIENDLY | Q.SPRITE_ACTIVE | Q.SPRITE_DEFAULT
 					});
+					this.initvx = this.p.vx;
 
-					this.add('2d, aiBounce, animation');
+					this.add('2d, aiBounce, animation, tween');
 
 					this.on("bump.left,bump.right,bump.bottom", function (collision) {
-						if (collision.obj.isA("Sonic")) {
-							collision.obj.Die();
-							//TIENE QUE PONER LAURA LO DE PUNTOS TOTALES Y ESO. QUE NO MUERAS AL TOQUE VAMOS	
+						if (collision.obj.isA("Sonic") && !this.col) {
+							this.col = true;
+							if (Q.state.get("score") <= 0) {
+								if (Q.state.get("lives") > 1) {
+									Q.state.dec("lives", 1);
+									Q.stageScene("livesLeft", Q.state.get("lives"));
+
+								}
+								else {
+									collision.obj.Die();
+								}
+							}
+							else {
+								Q.state.set("score", 0);
+								this.on("bump.left, bump.bottom", function () {
+									collision.obj.bounceLeft();
+									//	collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
+								this.on("bump.right", function () {
+									collision.obj.bounceRight();
+									//	collision.obj.animate({ x: collision.obj.p.x + 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
+							}
+							setTimeout(() => {
+								this.col = false;
+							}, 500);
+
 						}
 					});
-					/*
-					INTENTAR QUE HAGA EL FLIP
-					this.on("hit",function(collision){
-						console.log("choca");
-						var floor = Q("Floor");
-						if(collision.obj.isA("floor")){
-							collision.impact = this.p.vx;
-							if(this.p.defaultDirection == "left")
-								this.goRight(collision);
-							else
-								this.goLeft(collision);
-						}	
-					});*/
 
 					this.on("bump.top", function (collision) {
-						if (collision.obj.isA("Sonic")) {
-							if (this.p.hits === 1) {
-								collision.obj.bounce();
-								//this.on("endAnim", this, "die");
+						if (collision.obj.isA("Sonic") && !this.col) {
+							this.col = true;
+							collision.obj.bounceLeft();
+							//collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+							if (this.p.hits > 1) {
 								this.DEAD();
 							}
 							else {
 								this.p.hits++;
-								this.p.vx += 100; //Subirle la velocidad porque se enfada
-								this.p.x += 40; //MOVERLE PARA QUE SE ENFADE Y CORRA MAS
-								console.log(this.p.hits);
+								var dir = 1;
+								if (this.p.vx < 0) dir = -1;
+								this.p.vx += 80 * dir; //Subirle la velocidad porque se enfada
+								//this.p.x += 32; //MOVERLE PARA QUE SE ENFADE Y CORRA MAS
 							}
+							setTimeout(() => {
+								this.col = false;
+							}, 500);
 						}
 
 					});
@@ -227,55 +272,30 @@ var game = function () {
 
 				step: function (dt) {
 
-					if (this.p.vx != 0 && this.p.alive) {
+					if (this.p.vx != 0 && this.alive) {
+						if(this.p.vx > 0){
+							this.p.flip = 'x';
+							this.play("walk_left");
+						}
+						else{
+							this.p.flip = false;
 						this.play("walk_left");
+						}
 					}
 				},
 
 				DEAD: function () {
-					console.log("choca con mario");
-					if (this.p.alive) {
-						//console.log("choca con mario");
-						Q.audio.play("kill_enemy.mp3");
+					if (this.alive) {
 						this.alive = false;
-						Q.state.inc("score", 100);
-						//this.on("endAnim", this, "die");
-						console.log("MUERTO");
-						this.die();
+						Q.audio.play("kill_enemy.mp3");
+						this.play("die");
+						this.p.vx = 0;
 					}
 				},
 
 				die: function () {
 					this.destroy();
-				},
-
-				goRight: function () {
-					if (this.timeFromTurn > 1) {
-						this.timeFromTurn = 0;
-						this.p.vx = col.impact;
-						if (this.p.defaultDirection === 'left') {
-							this.p.flip = 'x';
-						}
-						else
-							this.p.flip = false;
-					}
-				},
-				goLeft: function (col) {
-					if (this.timeFromTurn > 1) {
-						this.timeFromTurn = 0;
-						this.p.vx = -col.impact;
-						if (this.p.defaultDirection === 'right') {
-							this.p.flip = 'x';
-						}
-						else {
-							this.p.flip = false;
-						}
-					}
 				}
-
-				// Listen for a sprite collision, if it's the player,
-				// end the game unless the enemy is hit on top
-
 			});
 
 
@@ -389,7 +409,14 @@ var game = function () {
 				step: function (dt) {
 
 					if (this.p.vx != 0 && this.alive) {
+						if(this.p.vx > 0){
+							this.p.flip = 'x';
+							this.play("run");
+						}
+						else{
+							this.p.flip = false;
 						this.play("run");
+						}
 					}
 				}
 				// Listen for a sprite collision, if it's the player,
@@ -504,54 +531,53 @@ var game = function () {
 			Q.Sprite.extend("Bee", {
 				init: function (p) {
 
+					this.alive = true;
+					this.time = 0;
 					this._super(p, {
 						sheet: "bee",
 						sprite: "Bee_anim",
-						x: 350,
-						y: 350,
 						gravity: 0 //Asi va en horizontal por el cielo
 
 					});
+					this.initx = this.p.x;
 
-					this.add('2d, aiBounce, animation, DefaultEnemy');
+					this.add('2d, tween, aiBounce, animation, DefaultEnemy');
 				},
 
 				step: function (dt) {
-					if (this.alive) {
-						if (this.p.x > 900) {
-							this.p.vx = -this.p.vx;
 
-						} else if (this.p.x < 550) {
-							this.p.vx = +this.p.vx;
+					if (this.alive) {
+
+						if (this.p.x > this.initx + 200 || this.p.x < this.initx - 200) {
+							this.p.vx = -this.p.vx;
 						}
 
-
 						var that = this;
-						setInterval(function () {
-							that.shoot();
-						}, 5000);
+						if (this.time === 0 || this.time === undefined) {
+							this.time = 1;
+							setTimeout(() => {
+								this.time = 0;
+								that.shoot();
+							}, 500);
+						}
 
 						this.play("standing");
 						if (this.p.vx == 0)
 							this.p.vx = 200;
-
-
-						/*var that = this;
-						setInterval(function(){ 
-							that.shoot(); }, 10000);*/
 					}
 				},
 				/**
 				 * Este método va a crear un nuevo objeto "Bullet".
-				 * La posición del nuevo "Bullet" tiene que ser el mismo x que el jugador
-				 * y un poco por encima del objeto "Player".
-				 * vy es la velocidad de "Bullet" sobre el eje Y.
+				 * La posición del nuevo "Bullet" tiene es la misma 
+				 * que la de la abeja en ese momento
 				 */
 				shoot: function () {
-					this.stage.insert(new Q.Bullet({
-						x: this.p.x,
-						y: this.p.y + this.p.w / 2
-					}))
+					if (this.alive) {
+						this.stage.insert(new Q.Bullet({
+							x: this.p.x,
+							y: this.p.y
+						}))
+					}
 				}
 
 			});
@@ -567,10 +593,12 @@ var game = function () {
 			 */
 			Q.Sprite.extend("Bullet", {
 				init: function (p) {
+					this.alive = true;
+					this.col = false;
 					this._super(p, {
 						sheet: "bullet",
 						sprite: "Bullet_anim",
-						//sensor: true,
+						sensor: true,
 					});
 
 					/**
@@ -579,16 +607,56 @@ var game = function () {
 					this.add("animation, tween");
 
 					this.on("hit.sprite", function (collision) {
-						if (collision.obj.isA("Sonic")) {
-							collision.obj.isA("Sonic").destroy();
-							this.destroy();
+						if (collision.obj.isA("Sonic") && !this.col) {
+							this.col = true;
+							if (Q.state.get("score") <= 0) {
+								if (Q.state.get("lives") > 1) {
+									Q.state.dec("lives", 1);
+									Q.stageScene("livesLeft", Q.state.get("lives"));
+
+
+								}
+								else {
+									collision.obj.Die();
+									this.destroy();
+								}
+							}
+							else {
+								Q.state.set("score", 0);
+								this.on("bump.left, bump.bottom, bump.top", function () {
+									collision.obj.bounceLeft();
+								//	collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
+								this.on("bump.right", function () {
+									collision.obj.bounceRight();
+								//	collision.obj.animate({ x: collision.obj.p.x + 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
+							}
+							setTimeout(() => {
+								this.col = false;
+							}, 500);
+
 						}
+
+						//this.destroy;
+
 					});
 				},
 				step: function (dt) {
-					this.play("fire");
-					this.animate({ y: this.p.y + 50 }, 10, Q.Easing.Linear, { callback: this.destroy });
+					if (this.alive) {
+						this.play("fire");
+						this.animate({ y: this.p.y + 200 }, 2, Q.Easing.Linear, { callback: this.destroy });
+						if (this.p.y > 700) this.destroy();
+					}
+				},
+
+				destroy: function () {
+					if (this.alive) {
+						this.alive = false;
+						this.destroy();
+					}
 				}
+
 			});
 
 
@@ -690,15 +758,15 @@ var game = function () {
 			Q.component("DefaultEnemy", {
 
 				added: function () {
-
+					this.col = false;
 					this.entity.alive = true;
 					this.entity.on("bump.left,bump.right,bump.bottom", function (collision) {
-						if (collision.obj.isA("Sonic")) {
-
+						if (collision.obj.isA("Sonic") && !this.col) {
+							this.col = true;
 							if (Q.state.get("score") <= 0) {
 								if (Q.state.get("lives") > 1) {
 									Q.state.dec("lives", 1);
-									Q.stageScene("livesLeft", 1);
+									Q.stageScene("livesLeft", Q.state.get("lives"));
 
 								}
 								else {
@@ -707,15 +775,18 @@ var game = function () {
 							}
 							else {
 								Q.state.set("score", 0);
-								/*if (Q.state.get("score") > 50) {
-									Q.state.dec("score", 50);
-								}
-								else {
-									Q.state.set("score", 0);
-								}*/
-								collision.obj.bounce();
-								collision.obj.p.vx = -300;
+								this.on("bump.left, bump.down", function () {
+									collision.obj.bounceLeft();
+									//	collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
+								this.on("bump.right", function () {
+									collision.obj.bounceRight();
+									//	collision.obj.animate({ x: collision.obj.p.x + 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
+								});
 							}
+							setTimeout(() => {
+								this.col = false;
+							}, 300);
 
 						}
 					});
@@ -752,16 +823,17 @@ var game = function () {
 
 
 			////////////////////////////////////ANIMACIONES/////////////////////////////////////////////////////
-			
+
 			//Animaciones Sonic
 			Q.animations('Sonic_anim', {
-				run_right: { frames: [1, 2, 3, 4, 5, 6], rate: 1 / 10 },
-				run_left: { frames: [19, 18, 17, 16, 15, 14], rate: 1 / 10 },
-				Stand_right: { frames: [0] },
-				Stand_left: { frames: [13] },
-				fall_right: { frames: [7, 8, 9, 10, 11, 12], rate: 1/10/* loop: true */},
-				fall_left: { frames: [20, 21, 22, 23, 24, 25], rate: 1/10, loop: false },
-				die: { frames: [12], loop: true }
+				run_right: {frames: [1,2, 3, 4, 5, 6], rate: 1/10},
+				Stand_right:{frames:[0]},
+				jump_right:{frames: [7, 8, 9, 10, 11, 12], rate: 1/10},
+				super_speed:{frames: [13,14, 15, 16, 17, 18, 19, 20], rate: 1/3},
+				die: { frames: [12], loop: true },
+				down: {frames:[21, 22, 23], rate: 1/10},
+				bola: {frames:[12], rate: 1/3},
+				tumbado: {frames:[21], rate: 1/10}
 			});
 
 
@@ -769,7 +841,7 @@ var game = function () {
 			Q.animations('eggman_anim', {
 				stand_left: { frames: [0], rate: 1 / 3 },
 				walk_left: { frames: [1, 2, 3, 4], rate: 1 / 4 },
-				die: { frames: [5, 6, 7], rate: 1 / 150, loop: false, trigger: "endAnim" }
+				die: { frames: [5, 6, 7], rate: 1 / 3, loop: false, trigger: "endAnim" }
 			});
 
 			//Animaciones Goomba
@@ -841,17 +913,17 @@ var game = function () {
 
 				Q.stageTMX("level.tmx", stage);
 
-				Q.audio.play('music_main.mp3', { loop: true });
+				//Q.audio.play('music_main.mp3', { loop: true });
 
 				var player = stage.insert(new Q.Sonic({ x: 150, y: 380 }));
-
+				stage.add("viewport").centerOn(150, 360);
 				//stage.insert(new Q.Coin({x: 200, y: 400}));
 				//stage.insert(new Q.Coin({x: 250, y: 400}));
 				//stage.insert(new Q.Coin({x: 300, y: 400}));
 
-				//stage.insert(new Q.Spring({x: 350, y:550}));
+				//stage.insert(new Q.Spring({ x: 350, y: 550 }));
 				stage.insert(new Q.Eggman({ x: 350, y: 550 }));
-				stage.insert(new Q.Bee({ x: 560, y: 350 }));
+				//stage.insert(new Q.Bee({ x: 250, y: 300 }));
 				//stage.insert(new Q.Coin({x: 350, y: 250}));
 				//stage.insert(new Q.Coin({x: 370, y: 400}));
 				//stage.insert(new Q.Coin({x: 425, y: 400}));
@@ -860,13 +932,13 @@ var game = function () {
 
 				stage.insert(new Q.Pingu({ x: 1460, y: 350 }));
 				stage.insert(new Q.Clown({ x: 1000, y: 350 }));
-
+				//stage.insert(new Q.Bee({ x: 1300, y:350 }));
 				stage.insert(new Q.Daemon({ x: 500, y: 350 }));
 				stage.insert(new Q.Shark({ x: 560, y: 350 }));
 
 
 				//		stage.insert(new Q.Peach({x: 2000,y: 517}));
-				stage.add("viewport").centerOn(150, 360);
+
 				//stage.add("viewport").follow(Q("Sonic", {x: true, y: false}).first());
 				//stage.viewport.offsetX = -100;
 				//stage.viewport.offsetY = 160;
@@ -884,7 +956,10 @@ var game = function () {
 				stage.insert(button);
 				button.on("click", function () {
 					Q.clearStages();
-					Q.state.reset({ score: 0, lives: 2 });
+					Q.state.reset({ score: 0, lives: 2, time: 0 });
+					var timer = setInterval(function () {
+						Q.state.inc("time", 1);
+					}, 1000);
 					Q.stageScene("level1");
 					Q.stageScene("hud", 3);
 				});
@@ -947,7 +1022,10 @@ var game = function () {
 			x: container.p.x / 2 - container.p.x,
 			y: -container.p.y / 3
 		}));
-
+		container.insert(new Q.TIME({
+			x: container.p.x / 2,
+			y: -container.p.y / 3
+		}));
 		container.insert(new Q.LIVES({
 			x: container.p.x / 2 + container.p.x,
 			y: -container.p.y / 3
@@ -960,7 +1038,7 @@ var game = function () {
 		var life = Q.state.p.lives;
 		Q.audio.stop("music_main.mp3");
 		Q.clearStages();
-		Q.state.reset({ score: 0, lives: life });
+		Q.state.reset({ score: 0, lives: life, time: 0 });
 		Q.stageScene('level1');
 		Q.stageScene("hud", 3);
 
@@ -1004,6 +1082,27 @@ var game = function () {
         */
 		update_label: function (score) {
 			this.p.label = "LIVES: " + Q.state.get("lives");
+		}
+	});
+
+
+	//TIME
+	Q.UI.Text.extend("TIME", {
+		init: function (p) {
+			this._super(p, {
+				label: "TIME: " + Q.state.get("time"),
+				color: "white",
+				size: "14"
+			});
+			/** Necesito extender porque quiero escuchar los cambios de la variable en el "State". */
+			Q.state.on("change.time", this, "update_label");
+		},
+
+        /**
+        * Con esta función actualizo el label.
+        */
+		update_label: function (score) {
+			this.p.label = "TIME: " + Q.state.get("time");
 		}
 	});
 }
