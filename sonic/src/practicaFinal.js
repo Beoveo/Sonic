@@ -12,8 +12,8 @@ var game = function () {
 		audioSupported: ['mp3'],
 		dataPath: "data/"
 	}).include("Sprites, Scenes, Input, 2D, Audio, Anim, Touch, UI, TMX").setup({
-		width: 520, // Set the default width to 800 pixels
-		height: 480, // Set the default height to 600 pixels
+		width: 620, // Set the default width to 800 pixels
+		height: 380, // Set the default height to 600 pixels
 	}).controls().touch().enableSound();
 
 
@@ -44,8 +44,6 @@ var game = function () {
 			Q.compileSheets("eggman.png", "eggman.json");
 			Q.compileSheets("bee.png", "bee.json");
 			Q.compileSheets("bullet.png", "bullet.json");
-
-
 
 
 
@@ -146,8 +144,8 @@ var game = function () {
 
 				step: function (dt) {
 					console.log(this.overtheShark);
-					if (this.p.y > 520)
-						this.stage.follow(Q("Sonic").first(), { x: true, y: false });
+					//if (this.p.y > 520)
+						//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
 
 
 					if (this.p.y > 620) {
@@ -948,7 +946,7 @@ var game = function () {
 			///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 			//INICIALIZACION
-			Q.loadTMX("level.tmx", function () {
+			Q.loadTMX("game.tmx", function () {
 				Q.stageScene("mainTitle");
 			});
 
@@ -956,12 +954,12 @@ var game = function () {
 			//NIVEL 1
 			Q.scene("level1", function (stage) {
 
-				Q.stageTMX("level.tmx", stage);
+				Q.stageTMX("game.tmx", stage);
 
 				//Q.audio.play('music_main.mp3', { loop: true });
 
-				var player = stage.insert(new Q.Sonic({ x: 150, y: 380 }));
-				stage.add("viewport").centerOn(150, 360);
+				var player = stage.insert(new Q.Sonic({ x: 210, y: 0 }));
+				
 				//stage.insert(new Q.Coin({x: 200, y: 400}));
 				//stage.insert(new Q.Coin({x: 250, y: 400}));
 				//stage.insert(new Q.Coin({x: 300, y: 400}));
@@ -969,7 +967,7 @@ var game = function () {
 				//stage.insert(new Q.Shark({ x: 180, y: 400 }))
 
 				//stage.insert(new Q.Spring({ x: 350, y: 550 }));
-				stage.insert(new Q.Eggman({ x: 350, y: 550 }));
+				//stage.insert(new Q.Eggman({ x: 350, y: 550 }));
 				//stage.insert(new Q.Bee({ x: 250, y: 300 }));
 				//stage.insert(new Q.Coin({x: 350, y: 250}));
 				//stage.insert(new Q.Coin({x: 370, y: 400}));
@@ -977,18 +975,18 @@ var game = function () {
 				//stage.insert(new Q.Coin({x: 480, y: 400}));
 
 
-				stage.insert(new Q.Pingu({ x: 1460, y: 350 }));
-				stage.insert(new Q.Clown({ x: 1000, y: 350 }));
+				//stage.insert(new Q.Pingu({ x: 1460, y: 350 }));
+				//stage.insert(new Q.Clown({ x: 1000, y: 350 }));
 				//stage.insert(new Q.Bee({ x: 1300, y:350 }));
-				stage.insert(new Q.Daemon({ x: 500, y: 350 }));
-				stage.insert(new Q.Shark({ x: 560, y: 350 }));
+				//stage.insert(new Q.Daemon({ x: 500, y: 350 }));
+				//stage.insert(new Q.Shark({ x: 560, y: 350 }));
 
 
-				//		stage.insert(new Q.Peach({x: 2000,y: 517}));
-
-				//stage.add("viewport").follow(Q("Sonic", {x: true, y: false}).first());
-				//stage.viewport.offsetX = -100;
-				//stage.viewport.offsetY = 160;
+				//stage.insert(new Q.Peach({x: 2000,y: 517}));
+				stage.add("viewport").centerOn(150, 194);
+				stage.follow(Q("Sonic").first(), { x: true, y: false });
+				stage.viewport.offsetX = -100;
+				stage.viewport.offsetY = 160;
 			});
 
 
