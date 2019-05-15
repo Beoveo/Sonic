@@ -144,6 +144,8 @@ var game = function () {
 				},
 
 				step: function (dt) {
+
+					
 					if(this.p.x >= 3865.95)
                     {	
 						if(!this.finalBoss){
@@ -307,6 +309,7 @@ var game = function () {
 				DEAD: function () {
 					if (this.alive) {
 						this.alive = false;
+						
 						Q.audio.stop();
 						Q.stageScene("endGame", 1, { label: "You Win!" });
 						Q.audio.play("BossDefeated.mp3");
