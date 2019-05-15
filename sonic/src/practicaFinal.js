@@ -51,6 +51,7 @@ var game = function () {
 			//SPRITE SONIC
 			Q.Sprite.extend("Sonic", {
 				init: function (p) {
+					this.finalBoss = false;
 					this.overtheShark = false;
 					this.alive = true;
 					this.lastMileStone = 1;
@@ -95,7 +96,7 @@ var game = function () {
 					if (this.alive) {
 						this.alive = false;
 						Q.audio.stop();
-						Q.audio.play("mario-bros-mamma-mia.mp3");
+						Q.audio.play("GameOver.mp3");
 						this.gravity = 0;
 						//this.stage.unfollow();
 						this.play("die");
@@ -137,13 +138,25 @@ var game = function () {
 						this.destroy();
 						Q.state.dec("lives", 1);
 						Q.audio.stop();
-						Q.audio.play("mario-bros-mamma-mia.mp3");
+						Q.audio.play("GameOver.mp3");
 						Q.stageScene("endGame", 1, { label: "You Died" });
 					}
 				},
 
 				step: function (dt) {
 					console.log(this.overtheShark);
+					if(this.p.x >= 3865.95)
+                    {	
+						
+						if(!this.finalBoss){
+							this.finalBoss = true;
+							Q.audio.stop();
+							Q.audio.play("FinalBoss.mp3", {loop: true})
+						}
+                        this.stage.unfollow();
+						this.stage.add("viewport").centerOn(4100, 190);
+						
+                    }
 					//if (this.p.y > 520)
 						//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
 
@@ -294,7 +307,7 @@ var game = function () {
 				DEAD: function () {
 					if (this.alive) {
 						this.alive = false;
-						Q.audio.play("kill_enemy.mp3");
+						Q.audio.play("BossDefeated.mp3");
 						this.play("die");
 						this.p.vx = 0;
 					}
@@ -654,7 +667,7 @@ var game = function () {
 						if (collision.obj.isA("Sonic")) {
 							if (!this.taken) {
 								this.taken = true;
-								Q.audio.play("coin.mp3");
+								Q.audio.play("GetRing.mp3");
 								this.animate({ y: p.y - 50 }, 0.25, Q.Easing.Linear, { callback: this.destroy });
 								Q.state.inc("score", 10);
 							}
@@ -751,7 +764,7 @@ var game = function () {
 				extend: {
 					DEAD: function () {
 						if (this.alive) {
-							Q.audio.play("kill_enemy.mp3");
+							Q.audio.play("EnemyDie.mp3");
 							this.alive = false;
 							Q.state.inc("score", 100);
 							this.destroy();
@@ -839,8 +852,7 @@ var game = function () {
 
 			///////////////////////////////////AUDIOS///////////////////////////////////////////////////////////
 			//CARGA DE AUDIOS
-			Q.load(["music_die.mp3", "music_level_complete.mp3", "music_main.mp3",
-				"coin.mp3", "mario-bros-mamma-mia.mp3", "squish_enemy.mp3", "kill_enemy.mp3", "1up.mp3"], function () {
+			Q.load(["BossDefeated.mp3", "EnemyHit.mp3", "FinalBoss.mp3", "GameOver.mp3", "GetRing.mp3", "GreenHillZone.mp3", "MainTitle.mp3", "EnemyDie.mp3"], function () {
 
 				});
 			///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
@@ -855,8 +867,8 @@ var game = function () {
 			Q.scene("level1", function (stage) {
 
 				Q.stageTMX("game.tmx", stage);
-
-				//Q.audio.play('music_main.mp3', { loop: true });
+				Q.audio.stop();
+				Q.audio.play('GreenHillZone.mp3', { loop: true });
 				//Para pos inicial x:200
 				//Para probar parte del BOSS x: 3500
 				var player = stage.insert(new Q.Sonic({ x: 200, y: 150 }));
@@ -948,7 +960,8 @@ var game = function () {
 
 			//TITULO DEL JUEGO
 			Q.scene("mainTitle", function (stage) {
-
+				Q.audio.stop();
+				Q.audio.play('MainTitle.mp3', {loop: true});
 				var button = new Q.UI.Button({
 					x: Q.width / 2,
 					y: Q.height / 2,
@@ -970,7 +983,7 @@ var game = function () {
 			//GAME OVER
 			Q.scene('endGame', function (stage) {
 
-				Q.audio.stop("music_main.mp3");
+				Q.audio.stop("GreenHillZone.mp3");
 				var container = stage.insert(new Q.UI.Container({
 
 					x: Q.width / 2,
@@ -1037,7 +1050,7 @@ var game = function () {
 	//Escenario que se muestra cuando todavía le quedan vidas
 	Q.scene('livesLeft', function (stage) {
 		var life = Q.state.p.lives;
-		Q.audio.stop("music_main.mp3");
+		Q.audio.stop("GreenHillZone.mp3");
 		Q.clearStages();
 		Q.state.reset({ score: 0, lives: life, time: 0 });
 		Q.stageScene('level1');
