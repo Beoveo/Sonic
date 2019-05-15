@@ -202,6 +202,7 @@ var game = function () {
 						}
 						else {
 							this.play("Stand_right");
+							console.log("x:" + this.p.x + "y:" + this.p.y);
 						}
 					}
 
@@ -306,93 +307,6 @@ var game = function () {
 
 
 
-
-			//SPRITE GOOMBA
-			Q.Sprite.extend("Goomba", {
-
-
-				init: function (p) {
-
-
-					this._super(p, {
-						sheet: "goomba",
-						sprite: "Goomba_anim",
-						x: 1500,
-						y: 450,
-						vx: 100
-					});
-
-					this.add('2d, aiBounce, animation, DefaultEnemy');
-
-
-				},
-
-
-				step: function (dt) {
-
-					if (this.p.vx != 0 && this.alive) {
-						this.play("run");
-					}
-				}
-				// Listen for a sprite collision, if it's the player,
-				// end the game unless the enemy is hit on top
-
-			});
-
-			//SPRITE PEACH
-			Q.Sprite.extend("Peach", {
-
-
-				init: function (p) {
-
-
-					this._super(p, {
-						asset: "princess.png",
-
-					});
-				},
-
-				// Listen for a sprite collision, if it's the player,
-				// end the game unless the enemy is hit on top
-
-			});
-
-
-			//SPRITE BLOOPA
-			Q.Sprite.extend("Bloopa", {
-
-
-				init: function (p) {
-
-
-					this._super(p, {
-						sheet: "bloopa",
-						sprite: "Bloopa_anim",
-						x: 200,
-						y: 350,
-						gravity: 1 / 4
-
-					});
-
-					this.add('2d, aiBounce, animation, DefaultEnemy');
-
-					this.on("dead", this, "DEAD");
-				},
-
-				step: function (dt) {
-
-					if (this.alive) {
-						this.play("standing");
-						if (this.p.vy == 0)
-							this.p.vy = -300;
-					}
-
-				}
-				// Listen for a sprite collision, if it's the player,
-				// end the game unless the enemy is hit on top
-
-			});
-
 			//SPRITE PINGU
 			Q.Sprite.extend("Pingu", {
 
@@ -472,8 +386,6 @@ var game = function () {
 					this._super(p, {
 						sheet: "daemon",
 						sprite: "Daemon_anim",
-						x: 200,
-						y: 350,
 						gravity: 1 / 4
 
 					});
@@ -530,10 +442,7 @@ var game = function () {
 							//collision.obj.p.y = this.p.y;
 						}
 						else this.sonic = false;
-
-
 					});
-					//this.on("dead", this, "DEAD");
 				},
 
 				step: function (dt) {
@@ -571,9 +480,6 @@ var game = function () {
 					}*/
 
 				}
-				// Listen for a sprite collision, if it's the player,
-				// end the game unless the enemy is hit on top
-
 			});
 
 			//SPRITE BEE
@@ -584,7 +490,9 @@ var game = function () {
 					this.time = 0;
 					this._super(p, {
 						sheet: "bee",
-						sprite: "Bee_anim",
+						sprite:"Bee_anim",
+						x: 300,
+						y: 250,
 						gravity: 0 //Asi va en horizontal por el cielo
 
 					});
@@ -662,8 +570,6 @@ var game = function () {
 								if (Q.state.get("lives") > 1) {
 									Q.state.dec("lives", 1);
 									Q.stageScene("livesLeft", Q.state.get("lives"));
-
-
 								}
 								else {
 									collision.obj.Die();
@@ -674,21 +580,15 @@ var game = function () {
 								Q.state.set("score", 0);
 								this.on("bump.left, bump.bottom, bump.top", function () {
 									collision.obj.bounceLeft();
-									//	collision.obj.animate({ x: collision.obj.p.x - 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
 								});
 								this.on("bump.right", function () {
 									collision.obj.bounceRight();
-									//	collision.obj.animate({ x: collision.obj.p.x + 50, y: collision.obj.p.y - 32 }, 0.25, Q.Easing.Linear);
 								});
 							}
 							setTimeout(() => {
 								this.col = false;
 							}, 500);
-
 						}
-
-						//this.destroy;
-
 					});
 				},
 				step: function (dt) {
@@ -957,33 +857,89 @@ var game = function () {
 				Q.stageTMX("game.tmx", stage);
 
 				//Q.audio.play('music_main.mp3', { loop: true });
-
-				var player = stage.insert(new Q.Sonic({ x: 210, y: 0 }));
+				//Para pos inicial x:200
+				//Para probar parte del BOSS x: 3500
+				var player = stage.insert(new Q.Sonic({ x: 200, y: 150 }));
 				
-				//stage.insert(new Q.Coin({x: 200, y: 400}));
-				//stage.insert(new Q.Coin({x: 250, y: 400}));
-				//stage.insert(new Q.Coin({x: 300, y: 400}));
+				stage.insert(new Q.Coin({x: 250, y: 210}));
+				stage.insert(new Q.Coin({x: 300, y: 210}));
+				stage.insert(new Q.Coin({x: 350, y: 210}));
 
-				//stage.insert(new Q.Shark({ x: 180, y: 400 }))
+				stage.insert(new Q.Coin({x: 400, y: 270}));
+				stage.insert(new Q.Coin({x: 450, y: 270}));
+				stage.insert(new Q.Coin({x: 500, y: 270}));
+				stage.insert(new Q.Coin({x: 550, y: 270}));
 
-				//stage.insert(new Q.Spring({ x: 350, y: 550 }));
-				//stage.insert(new Q.Eggman({ x: 350, y: 550 }));
-				//stage.insert(new Q.Bee({ x: 250, y: 300 }));
-				//stage.insert(new Q.Coin({x: 350, y: 250}));
-				//stage.insert(new Q.Coin({x: 370, y: 400}));
-				//stage.insert(new Q.Coin({x: 425, y: 400}));
-				//stage.insert(new Q.Coin({x: 480, y: 400}));
+				stage.insert(new Q.Coin({x: 600, y: 210}));
+				stage.insert(new Q.Coin({x: 650, y: 210}));
+				stage.insert(new Q.Coin({x: 700, y: 210}));
 
+				stage.insert(new Q.Coin({x: 920, y: 210}));
+				stage.insert(new Q.Coin({x: 970, y: 210}));
 
-				//stage.insert(new Q.Pingu({ x: 1460, y: 350 }));
-				//stage.insert(new Q.Clown({ x: 1000, y: 350 }));
-				//stage.insert(new Q.Bee({ x: 1300, y:350 }));
-				//stage.insert(new Q.Daemon({ x: 500, y: 350 }));
+				stage.insert(new Q.Coin({x: 1110, y: 210}));
+				stage.insert(new Q.Coin({x: 1160, y: 210}));
+
+				stage.insert(new Q.Coin({x: 1280, y: 210}));
+				stage.insert(new Q.Coin({x: 1330, y: 210}));
+				stage.insert(new Q.Coin({x: 1380, y: 210}));
+				stage.insert(new Q.Coin({x: 1430, y: 210}));
+
+				stage.insert(new Q.Coin({x: 1550, y: 210}));
+				stage.insert(new Q.Coin({x: 1600, y: 210}));
+				stage.insert(new Q.Coin({x: 1650, y: 210}));
+
+				stage.insert(new Q.Coin({x: 1750, y: 210}));
+				stage.insert(new Q.Coin({x: 1800, y: 210}));
+
+				stage.insert(new Q.Coin({x: 1880, y: 190}));
+				stage.insert(new Q.Coin({x: 1930, y: 210}));
+				stage.insert(new Q.Coin({x: 1980, y: 210}));
+				stage.insert(new Q.Coin({x: 2030, y: 210}));
+				stage.insert(new Q.Coin({x: 2080, y: 190}));
+
+				stage.insert(new Q.Coin({x: 2170, y: 210}));
+				stage.insert(new Q.Coin({x: 2210, y: 210}));
+
+				stage.insert(new Q.Coin({x: 2420, y: 210}));
+				stage.insert(new Q.Coin({x: 2470, y: 210}));
+				stage.insert(new Q.Coin({x: 2520, y: 210}));
+				stage.insert(new Q.Coin({x: 2570, y: 210}));
+				stage.insert(new Q.Coin({x: 2620, y: 210}));
+
+				stage.insert(new Q.Coin({x: 2670, y: 270}));
+				stage.insert(new Q.Coin({x: 2720, y: 270}));
+				stage.insert(new Q.Coin({x: 2770, y: 270}));
+				stage.insert(new Q.Coin({x: 2820, y: 270}));
+
+				stage.insert(new Q.Coin({x: 2870, y: 210}));
+				stage.insert(new Q.Coin({x: 2920, y: 210}));
+				stage.insert(new Q.Coin({x: 2970, y: 210}));
+				stage.insert(new Q.Coin({x: 3020, y: 210}));
+				stage.insert(new Q.Coin({x: 3070, y: 210}));
+
+				stage.insert(new Q.Coin({x: 3120, y: 210}));
+				stage.insert(new Q.Coin({x: 3170, y: 210}));
+
+				stage.insert(new Q.Coin({x: 3220, y: 270}));
+				stage.insert(new Q.Coin({x: 3270, y: 270}));
+				stage.insert(new Q.Coin({x: 3320, y: 210}));
+				stage.insert(new Q.Coin({x: 3370, y: 210}));
+				stage.insert(new Q.Coin({x: 3420, y: 270}));
+				stage.insert(new Q.Coin({x: 3470, y: 270}));
+				stage.insert(new Q.Coin({x: 3520, y: 210}));
+				stage.insert(new Q.Coin({x: 3570, y: 210}));
+				
+				//Enemigos
+				stage.insert(new Q.Bee({x: 1000, y: 90 }));//{x: 1000, y: 250 }
+				stage.insert(new Q.Daemon({ x: 750, y: 50 }));
+				stage.insert(new Q.Pingu({ x: 1970, y: 150 }));
+				stage.insert(new Q.Clown({ x: 2850, y: 150 }));
+				stage.insert(new Q.Spring({ x: 3650, y: 272 }));
+				stage.insert(new Q.Eggman({ x: 4090, y: 150 }));
 				//stage.insert(new Q.Shark({ x: 560, y: 350 }));
-
-
-				//stage.insert(new Q.Peach({x: 2000,y: 517}));
-				stage.add("viewport").centerOn(150, 194);
+				
+				stage.add("viewport").centerOn(200, 194);
 				stage.follow(Q("Sonic").first(), { x: true, y: false });
 				stage.viewport.offsetX = -100;
 				stage.viewport.offsetY = 160;

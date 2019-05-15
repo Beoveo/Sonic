@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="150" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="150" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="1">
  <tileset firstgid="1" name="sprites-1" tilewidth="32" tileheight="32" tilecount="1155" columns="33">
   <image source="../images/sprites-1.png" width="1080" height="1121"/>
  </tileset>
- <imagelayer id="4" name="background">
+ <imagelayer id="11" name="background">
   <image source="../images/background.png" width="512" height="384"/>
  </imagelayer>
- <layer id="1" name="Fondo" width="150" height="12">
+ <layer id="8" name="Fondo" width="150" height="12">
   <properties>
    <property name="collision" type="bool" value="true"/>
   </properties>
@@ -418,14 +418,6 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="39"/>
-   <tile gid="39"/>
-   <tile gid="39"/>
-   <tile gid="39"/>
-   <tile gid="39"/>
-   <tile gid="39"/>
-   <tile gid="40"/>
    <tile/>
    <tile/>
    <tile/>
@@ -567,15 +559,6 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="73"/>
    <tile/>
    <tile/>
    <tile/>
@@ -716,16 +699,6 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="73"/>
    <tile/>
    <tile/>
    <tile/>
@@ -865,17 +838,6 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="72"/>
-   <tile gid="73"/>
    <tile/>
    <tile/>
    <tile/>
@@ -1014,18 +976,6 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="105"/>
-   <tile gid="106"/>
    <tile/>
    <tile/>
    <tile/>
@@ -1163,8 +1113,58 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="105"/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -1312,8 +1312,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="38"/>
-   <tile gid="105"/>
+   <tile/>
+   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -1813,7 +1813,7 @@
    <tile/>
   </data>
  </layer>
- <layer id="2" name="Objetos" width="150" height="12">
+ <layer id="9" name="Objetos" width="150" height="12">
   <properties>
    <property name="collision" type="bool" value="true"/>
   </properties>
@@ -3620,7 +3620,7 @@
    <tile/>
   </data>
  </layer>
- <layer id="3" name="Flores" width="150" height="12">
+ <layer id="10" name="Flores" width="150" height="12">
   <data>
    <tile/>
    <tile/>
@@ -3885,8 +3885,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="124"/>
-   <tile gid="125"/>
+   <tile/>
+   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -4932,8 +4932,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="124"/>
+   <tile gid="125"/>
    <tile/>
    <tile/>
    <tile/>
