@@ -83,9 +83,17 @@ var game = function () {
 						if (collision.obj.isA("Shark")) {
 							this.overtheShark = true;
 							Q.stage().insert(this, collision.obj);
+							
+						//	this.p.vy = collision.obj.p.vy;
+						//	this.p.vx = 0;
+						//	this.p.x = collision.obj.p.x;
+						//	this.p.y = collision.obj.p.y-37;
 						}
 						else {
 							this.overtheShark = false;
+							//Además de cuando choque con otra cosa, hay que meter que cambie el this.overtheShark a false
+							//cuando deje de estar sobre el tiburón
+							//Q.stage().del(this, collision.obj);
 						}
 					});
 
@@ -145,7 +153,11 @@ var game = function () {
 				},
 
 				step: function (dt) {
-					if(this.overtheShark){return;}
+					if(this.overtheShark){
+						console.log("POS: (" + this.p.x + ", " + this.p.y + ")		VEL: " + this.p.vy);
+						//this.p.vy = -150;
+						return;
+					}
 					if(this.p.x >= 3865.95)
                     {	
 						if(!this.finalBoss){
@@ -465,12 +477,25 @@ var game = function () {
 				},
 
 				step: function (dt) {
-
+						
 					if (this.p.y > this.inity + 150 || this.p.y < this.inity - 150) {
+						console.log("POS SHARK: " + this.p.y + "		VEL SHARK: " + this.p.vy);
 						if (this.dir === "up") this.dir = "down";
 						else this.dir = "up";
+
 						this.p.vy = -this.p.vy;
 					}
+					else if(this.p.vy === 0){
+						if(this.dir === "down"){
+							this.dir = "up";
+							this.p.vy = 150;
+						}
+						else{
+							this.dir = "down";
+							this.p.vy = -150;
+						}
+					}
+				
 /*
 					if(this.p.vy === 0){
 						if(this.dir === "up"){
