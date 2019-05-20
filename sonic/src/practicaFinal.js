@@ -82,6 +82,7 @@ var game = function () {
 					this.on("bump.bottom", function (collision) {
 						if (collision.obj.isA("Shark")) {
 							this.overtheShark = true;
+							Q.stage().insert(this, collision.obj);
 						}
 						else {
 							this.overtheShark = false;
@@ -144,8 +145,7 @@ var game = function () {
 				},
 
 				step: function (dt) {
-
-					
+					if(this.overtheShark){return;}
 					if(this.p.x >= 3865.95)
                     {	
 						if(!this.finalBoss){
@@ -156,7 +156,8 @@ var game = function () {
                         this.stage.unfollow();
 						this.stage.add("viewport").centerOn(4100, 190);
 						
-                    }
+					}
+					
 					//if (this.p.y > 520)
 						//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
 
@@ -447,7 +448,7 @@ var game = function () {
 					this.on("hit.sprite", function (collision) {
 						this.p.vy = -this.p.vy;
 					});
-					this.on("bump.top", function (collision) {
+					/*this.on("bump.top", function (collision) {
 						if (collision.obj.isA("Sonic")) {
 							this.sonic = true;
 							/*	if(this.p.y > this.inity){
@@ -455,12 +456,12 @@ var game = function () {
 								}
 								else {
 									this.p.vy = -(this.initvy - this.inity);
-								}*/
+								}
 							//collision.obj.p.vy = this.p.vy;
 							//collision.obj.p.y = this.p.y;
 						}
 						else this.sonic = false;
-					});
+					});*/
 				},
 
 				step: function (dt) {
@@ -470,6 +471,12 @@ var game = function () {
 						else this.dir = "up";
 						this.p.vy = -this.p.vy;
 					}
+/*
+					if(this.p.vy === 0){
+						if(this.dir === "up"){
+							this.
+						}
+					}*/
 					/*else if (this.p.vy === 0 && (this.p.y < this.inity + 150 || this.p.y > this.inity - 150)) {
 						//if(!this.sonic){
 						this.p.inity = this.p.y + 150;
@@ -881,7 +888,7 @@ var game = function () {
 				//Para probar parte del BOSS x: 3500
 				var player = stage.insert(new Q.Sonic({ x: 200, y: 150 }));
 				
-				stage.insert(new Q.Coin({x: 250, y: 210}));
+				/*stage.insert(new Q.Coin({x: 250, y: 210}));
 				stage.insert(new Q.Coin({x: 300, y: 210}));
 				stage.insert(new Q.Coin({x: 350, y: 210}));
 
@@ -957,7 +964,9 @@ var game = function () {
 				stage.insert(new Q.Clown({ x: 2850, y: 150 }));
 				stage.insert(new Q.Spring({ x: 3650, y: 272 }));
 				stage.insert(new Q.Eggman({ x: 4090, y: 150 }));
-				//stage.insert(new Q.Shark({ x: 560, y: 350 }));
+				//stage.insert(new Q.Shark({ x: 560, y: 350 }));*/
+				stage.insert(new Q.Spring({ x: 2800, y: 272 }));
+				stage.insert(new Q.Shark({ x: 2850, y: 100 }));
 				
 				stage.add("viewport").centerOn(200, 194);
 				stage.follow(Q("Sonic").first(), { x: true, y: false });
