@@ -80,11 +80,17 @@ var game = function () {
 					});*/
 
 					this.on("bump.bottom", function (collision) {
-						if (collision.obj.isA("Shark")) {
+						if (collision.obj.isA("Shark") ) {
 							this.overtheShark = true;
+							this.shark = collision.obj;
+							this.collisionMask = 0;
 						}
 						else {
 							this.overtheShark = false;
+							console.log("false");
+							//Además de cuando choque con otra cosa, hay que meter que cambie el this.overtheShark a false
+							//cuando deje de estar sobre el tiburón
+							//Q.stage().del(this, collision.obj);
 						}
 					});
 
@@ -144,22 +150,28 @@ var game = function () {
 				},
 
 				step: function (dt) {
-
-					
-					if(this.p.x >= 3865.95)
+					if(this.overtheShark){
+						//console.log("POS: (" + this.p.x + ", " + this.p.y + ")		VEL: " + this.p.vy);
+						this.p.y = this.shark.p.y - 37;
+						
+						//this.p.vy = this.shark.p.vy;
+						//return;
+					}
+					if(this.p.x >= 5200)
                     {	
 						if(!this.finalBoss){
 							this.finalBoss = true;
 							Q.audio.stop();
 							Q.audio.play("FinalBoss.mp3", {loop: true})
 						}
+
                         this.stage.unfollow();
-						this.stage.add("viewport").centerOn(4100, 190);
+						this.stage.add("viewport").centerOn(5390, 190);
 						
-                    }
+					}
+					
 					//if (this.p.y > 520)
 						//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
-
 
 					if (this.p.y > 620) {
 						this.fall();
@@ -172,12 +184,14 @@ var game = function () {
 						this.p.speed = 400;
 						this.p.agachado = false;
 						this.p.bola = true;
+						this.overtheShark = false;
 					}
 					else if (Q.inputs['down']) {
 						this.p.agachado = true;
 						if (this.p.speed > 500) {
 							this.play("bola");
 							this.p.bola = true;
+							this.overtheShark = false;
 						}
 					}
 					//DERECHA
@@ -185,6 +199,7 @@ var game = function () {
 						this.p.flip = false;
 						this.p.agachado = false;
 						this.p.bola = false;
+						this.overtheShark = false;
 						this.p.speed = this.p.speed + 10;
 						if (this.p.speed > 500) {
 							this.play("super_speed");
@@ -198,6 +213,7 @@ var game = function () {
 						this.p.flip = 'x';
 						this.p.agachado = false;
 						this.p.bola = false;
+						this.overtheShark = false;
 						this.p.speed = this.p.speed + 50;
 						if (this.p.speed > 1000) {
 							this.play("super_speed");
@@ -431,23 +447,31 @@ var game = function () {
 			//SPRITE SHARK
 			Q.Sprite.extend("Shark", {
 
-
+			
 				init: function (p) {
 					//this.sonic = false;
+					this.bajando = true;
+					this.maxy = 300;
+					this.miny= 100;
 					this.dir = "up";
 					this._super(p, {
 						sheet: "shark",
 						sprite: "Shark_anim",
-						gravity: 1 / 4
-
+						gravity: 1 / 4,
+						sonic: 0,
+						vy : 150
 					});
 					this.inity = this.p.y;
-					this.initvy = this.p.vy;
-					this.add('2d, aiBounce, animation');
+					//this.initvy = this.p.vy;
+					this.add('animation');
 					this.on("hit.sprite", function (collision) {
-						this.p.vy = -this.p.vy;
+						if(collision.obj.isA("Sonic")){
+						//this.p.y = -this.p.y;
+						this.p.sonic = 1;
+					}
+					//this.collisionMask = 0;
 					});
-					this.on("bump.top", function (collision) {
+					/*this.on("bump.top", function (collision) {
 						if (collision.obj.isA("Sonic")) {
 							this.sonic = true;
 							/*	if(this.p.y > this.inity){
@@ -455,47 +479,31 @@ var game = function () {
 								}
 								else {
 									this.p.vy = -(this.initvy - this.inity);
-								}*/
+								}
 							//collision.obj.p.vy = this.p.vy;
 							//collision.obj.p.y = this.p.y;
 						}
 						else this.sonic = false;
-					});
+					});*/
 				},
 
 				step: function (dt) {
+					this.play("standing");
+					//console.log("POS SHARK: " + this.p.y + "		VEL SHARK: " + this.p.vy);
+					if (this.dir === "up") this.dir = "down";
+					else this.dir = "up";
 
-					if (this.p.y > this.inity + 150 || this.p.y < this.inity - 150) {
-						if (this.dir === "up") this.dir = "down";
-						else this.dir = "up";
-						this.p.vy = -this.p.vy;
-					}
-					/*else if (this.p.vy === 0 && (this.p.y < this.inity + 150 || this.p.y > this.inity - 150)) {
-						//if(!this.sonic){
-						this.p.inity = this.p.y + 150;
-						this.p.vy = -300;*/
-					//}
-					/*else if(this.dir === "up"){
-						this.p.vy = -300;
-					}
-					else {
-						this.p.vy = 300;
-					}*/
-					/*
-					else if(this.dir === "up" ){
-						this.p.vy = -(150 - (this.p.y - this.inity));
-					}
-					else{
-						this.p.vy = 150 - (this.inity - this.p.y);
-					}
-					console.log(this.p.vy);*/
+					if(this.bajando)
+						this.p.y += dt*this.p.vy;
+					else
+						this.p.y -= dt*this.p.vy;
 
-					//}
-					/*if (this.alive) {
-						this.play("standing");
-						if (this.p.vy == 0)
-							this.p.vy = -300;
-					}*/
+					if(this.bajando && this.p.y >= this.maxy){
+						this.bajando = false;
+					}
+					else if(!this.bajando && this.p.y <= this.miny){
+						this.bajando = true;
+					}
 
 				}
 			});
@@ -878,10 +886,10 @@ var game = function () {
 				Q.audio.stop();
 				Q.audio.play('GreenHillZone.mp3', { loop: true });
 				//Para pos inicial x:200
-				//Para probar parte del BOSS x: 3500
+				//Para probar parte del BOSS x: 3500 - 2750
 				var player = stage.insert(new Q.Sonic({ x: 200, y: 150 }));
 				
-				stage.insert(new Q.Coin({x: 250, y: 210}));
+				/*stage.insert(new Q.Coin({x: 250, y: 210}));
 				stage.insert(new Q.Coin({x: 300, y: 210}));
 				stage.insert(new Q.Coin({x: 350, y: 210}));
 
@@ -949,6 +957,8 @@ var game = function () {
 				stage.insert(new Q.Coin({x: 3470, y: 270}));
 				stage.insert(new Q.Coin({x: 3520, y: 210}));
 				stage.insert(new Q.Coin({x: 3570, y: 210}));
+
+
 				
 				//Enemigos
 				stage.insert(new Q.Bee({x: 650, y: 100 }));//{x: 1000, y: 250 }
@@ -957,8 +967,18 @@ var game = function () {
 				stage.insert(new Q.Clown({ x: 2850, y: 150 }));
 				stage.insert(new Q.Spring({ x: 3650, y: 272 }));
 				stage.insert(new Q.Eggman({ x: 4090, y: 150 }));
-				//stage.insert(new Q.Shark({ x: 560, y: 350 }));
-				
+				//stage.insert(new Q.Shark({ x: 560, y: 350 }));*/
+				stage.insert(new Q.Spring({ x: 4930, y: 272 }));
+				//stage.insert(new Q.Shark({ x: 2850, y: 100 }));
+
+				stage.insert(new Q.Coin({x: 1830, y: 50}));
+				stage.insert(new Q.Coin({x: 1880, y: 50}));
+				stage.insert(new Q.Coin({x: 1930, y: 50}));
+				stage.insert(new Q.Coin({x: 1980, y: 50}));
+
+				stage.insert(new Q.Shark({ x: 1720, y: 100 }));
+				stage.insert(new Q.Shark({ x: 2250, y: 100 }));
+
 				stage.add("viewport").centerOn(200, 194);
 				stage.follow(Q("Sonic").first(), { x: true, y: false });
 				stage.viewport.offsetX = -100;
