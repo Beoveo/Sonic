@@ -54,6 +54,7 @@ var game = function () {
 					this.finalBoss = false;
 					this.overtheShark = false;
 					this.alive = true;
+					this.looping = false;
 					this.lastMileStone = 1;
 					this.oneUp = true;
 					this._super(p, {
@@ -71,30 +72,18 @@ var game = function () {
 
 					this.add('2d, platformerControls, animation, tween');
 
-					/*this.on("hit.sprite", function (collision) {
-						if (collision.obj.isA("Peach")) {
-							Q.audio.play("music_level_complete.mp3");
-							Q.stageScene("endGame", 1, { label: "You Win!" });
-							this.destroy();
-						}
-					});*/
-
 					this.on("bump.bottom", function (collision) {
-						if (collision.obj.isA("Shark") ) {
+						if (collision.obj.isA("Shark")) {
 							this.overtheShark = true;
 							this.shark = collision.obj;
 							this.collisionMask = 0;
 						}
 						else {
 							this.overtheShark = false;
-							console.log("false");
-							//Además de cuando choque con otra cosa, hay que meter que cambie el this.overtheShark a false
-							//cuando deje de estar sobre el tiburón
-							//Q.stage().del(this, collision.obj);
 						}
-						
-							
-						
+
+
+
 					});
 
 
@@ -153,28 +142,42 @@ var game = function () {
 				},
 
 				step: function (dt) {
-					if(this.overtheShark){
+					
+					if(this.p.speed >= 1550) this.p.speed = 1600;
+					if(this.p.speed <= -1550) this.p.speed = -1600;
+
+					if (this.p.x >= 3829.68 && this.p.x < 3900 && !this.looping && this.p.vx >= 1050) {
+						this.looping = true;
+						this.play("bola");
+						this.del('2d, platformerControls');
+						this.animate({ x: 3860, y: this.p.y - 70, angle: 360 }, 0.1, { callback: this.loopingTopRight});
+						this.add('2d, platformerControls');
+					}
+					else if(this.p.x >= 3829.68 && this.p.x < 3900 && this.p.vx < 1050 && !this.looping){
+						this.bounceLeft();
+					}
+
+					if (this.overtheShark) {
 						//console.log("POS: (" + this.p.x + ", " + this.p.y + ")		VEL: " + this.p.vy);
 						this.p.y = this.shark.p.y - 37;
-						
+
 						//this.p.vy = this.shark.p.vy;
 						//return;
 					}
-					if(this.p.x >= 5200)
-                    {	
-						if(!this.finalBoss){
+					if (this.p.x >= 5200) {
+						if (!this.finalBoss) {
 							this.finalBoss = true;
 							Q.audio.stop();
-							Q.audio.play("FinalBoss.mp3", {loop: true})
+							Q.audio.play("FinalBoss.mp3", { loop: true })
 						}
 
-                        this.stage.unfollow();
+						this.stage.unfollow();
 						this.stage.add("viewport").centerOn(5390, 190);
-						
+
 					}
-					
+
 					//if (this.p.y > 520)
-						//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
+					//this.stage.follow(Q("Sonic").first(), { x: true, y: false });
 
 					if (this.p.y > 620) {
 						this.fall();
@@ -238,6 +241,25 @@ var game = function () {
 						}
 					}
 
+				}, 
+
+				loopingTopRight(){
+					this.animate({ x: /* this.p.x - 40*/3800, y: this.p.y - 60, angle: 360 }, 0.1, { callback: this.loopingTopLeft});
+				},
+
+				loopingTopLeft(){
+					this.animate({ x: /*  this.p.x - 70*/ 3730, y: this.p.y + 60, angle: 360 }, 0.1, { callback: this.loopingBottomLeft});
+				},
+
+				loopingBottomLeft(){
+					this.animate({ x: /*this.p.x + 70*/ 3780, y: this.p.y + 70, angle: 360 }, 0.1, { callback: this.endLooping});
+				},
+
+				endLooping(){
+					setTimeout(()=>{this.looping = false;}, 1000);
+					this.animate({ x: 3850}, 0.1, Q.Easing.Linear);
+					this.p.speed = 1300;
+					
 				}
 			});
 
@@ -289,11 +311,11 @@ var game = function () {
 								this.col = true;
 								collision.obj.bounce();
 								if (this.p.hits == 3) {
-									
+
 									//this.destroy();
 									this.DEAD();
 								}
-								else{
+								else {
 									this.p.hits++;
 									var dir = 1;
 									if (this.p.vx < 0) dir = -1;
@@ -306,7 +328,7 @@ var game = function () {
 
 						}
 					});
-					
+
 					this.on("endAnim", this, "die");
 				},
 
@@ -328,7 +350,7 @@ var game = function () {
 				DEAD: function () {
 					if (this.alive) {
 						this.alive = false;
-						
+
 						Q.audio.stop();
 						Q.stageScene("endGame", 1, { label: "You Win!" });
 						Q.audio.play("BossDefeated.mp3");
@@ -450,29 +472,29 @@ var game = function () {
 			//SPRITE SHARK
 			Q.Sprite.extend("Shark", {
 
-			
+
 				init: function (p) {
 					//this.sonic = false;
 					this.bajando = true;
 					this.maxy = 300;
-					this.miny= 100;
+					this.miny = 100;
 					this.dir = "up";
 					this._super(p, {
 						sheet: "shark",
 						sprite: "Shark_anim",
 						gravity: 1 / 4,
 						sonic: 0,
-						vy : 150
+						vy: 150
 					});
 					this.inity = this.p.y;
 					//this.initvy = this.p.vy;
 					this.add('animation');
 					this.on("hit.sprite", function (collision) {
-						if(collision.obj.isA("Sonic")){
-						//this.p.y = -this.p.y;
-						this.p.sonic = 1;
-					}
-					//this.collisionMask = 0;
+						if (collision.obj.isA("Sonic")) {
+							//this.p.y = -this.p.y;
+							this.p.sonic = 1;
+						}
+						//this.collisionMask = 0;
 					});
 					/*this.on("bump.top", function (collision) {
 						if (collision.obj.isA("Sonic")) {
@@ -496,15 +518,15 @@ var game = function () {
 					if (this.dir === "up") this.dir = "down";
 					else this.dir = "up";
 
-					if(this.bajando)
-						this.p.y += dt*this.p.vy;
+					if (this.bajando)
+						this.p.y += dt * this.p.vy;
 					else
-						this.p.y -= dt*this.p.vy;
+						this.p.y -= dt * this.p.vy;
 
-					if(this.bajando && this.p.y >= this.maxy){
+					if (this.bajando && this.p.y >= this.maxy) {
 						this.bajando = false;
 					}
-					else if(!this.bajando && this.p.y <= this.miny){
+					else if (!this.bajando && this.p.y <= this.miny) {
 						this.bajando = true;
 					}
 
@@ -519,7 +541,7 @@ var game = function () {
 					this.time = 0;
 					this._super(p, {
 						sheet: "bee",
-						sprite:"Bee_anim",
+						sprite: "Bee_anim",
 						x: 300,
 						y: 250,
 						gravity: 0 //Asi va en horizontal por el cielo
@@ -873,7 +895,7 @@ var game = function () {
 			//CARGA DE AUDIOS
 			Q.load(["BossDefeated.mp3", "EnemyHit.mp3", "FinalBoss.mp3", "GameOver.mp3", "GetRing.mp3", "GreenHillZone.mp3", "MainTitle.mp3", "EnemyDie.mp3"], function () {
 
-				});
+			});
 			///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 			//INICIALIZACION
@@ -891,7 +913,7 @@ var game = function () {
 				//Para pos inicial x:200
 				//Para probar parte del BOSS x: 3500 - 2750
 				var player = stage.insert(new Q.Sonic({ x: 200, y: 150 }));
-				
+
 				/*stage.insert(new Q.Coin({x: 250, y: 210}));
 				stage.insert(new Q.Coin({x: 300, y: 210}));
 				stage.insert(new Q.Coin({x: 350, y: 210}));
@@ -973,10 +995,10 @@ var game = function () {
 				//stage.insert(new Q.Shark({ x: 560, y: 350 }));*/
 				//stage.insert(new Q.Shark({ x: 2850, y: 100 }));
 
-				stage.insert(new Q.Coin({x: 1830, y: 50}));
-				stage.insert(new Q.Coin({x: 1880, y: 50}));
-				stage.insert(new Q.Coin({x: 1930, y: 50}));
-				stage.insert(new Q.Coin({x: 1980, y: 50}));
+				stage.insert(new Q.Coin({ x: 1830, y: 50 }));
+				stage.insert(new Q.Coin({ x: 1880, y: 50 }));
+				stage.insert(new Q.Coin({ x: 1930, y: 50 }));
+				stage.insert(new Q.Coin({ x: 1980, y: 50 }));
 
 				stage.insert(new Q.Spring({ x: 4930, y: 272 }));
 
@@ -993,7 +1015,7 @@ var game = function () {
 			//TITULO DEL JUEGO
 			Q.scene("mainTitle", function (stage) {
 				Q.audio.stop();
-				Q.audio.play('MainTitle.mp3', {loop: true});
+				Q.audio.play('MainTitle.mp3', { loop: true });
 				var button = new Q.UI.Button({
 					x: Q.width / 2,
 					y: Q.height / 2,
