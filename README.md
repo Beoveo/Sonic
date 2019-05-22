@@ -23,7 +23,7 @@
 **1. Diseño del juego**
 
 **1.1 Objetivo del juego**
-El objetivo es derrotar a Eggman al final del nivel. Estando este mismo lleno de enemigos que intentarán derrotarte. Los anillos otorgan vidas a Sonic. Si te quedas con 0, eres derrotado y tienes que volver a empezar con una vida menos. VIDAS INICIALES? CAERSE?
+El objetivo es derrotar a Eggman al final del nivel. Estando este mismo lleno de enemigos que intentarán derrotarte. Los anillos otorgan vidas a Sonic. Si te quedas con 0, eres derrotado y tienes que volver a empezar con una vida menos. Se comienza con dos vidas.
 
 **1.2 Principales mecánicas**
 *	Andar: mecánica básica para Sonic, según mantengas la tecla de andar durante más tiempo sin tropezar o chocar, la velocidad aumentará.
@@ -37,7 +37,7 @@ El objetivo es derrotar a Eggman al final del nivel. Estando este mismo lleno de
 **1.3 Personajes**
 * Sonic: Es el protagonista del juego, teniendo en él las principales mecánicas del juego, mencionadas anteriormente. Correr, saltar, modo bola, muelle, loopings.
 * Pingüino horizontal: un pingüino que se mueve de forma horizontal, enemigo simple.
-* Tiburón martillo: Un tiburón que sirve como plataforma para Sonic PEROQUESI LO TOCAS AL CUERPO; MUERES?
+* Tiburón martillo: Un tiburón que sirve como plataforma para Sonic, para alcanzar zonas altas.
 * Demonio naranja: Un enemigo que se mueve de arriba abajo para intentar derriba a Sonic, solo se le vence en modo bola.
 * Payaso malabarista: enemigo que se mueve de izquierda a derecha con mayor velocidad que el pingüino.
 * Abeja lanza fuego: enemigo que lanza proyectiles cada determinado tiempo desde una cierta distancia.
