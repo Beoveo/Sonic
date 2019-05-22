@@ -92,6 +92,9 @@ var game = function () {
 							//cuando deje de estar sobre el tiburón
 							//Q.stage().del(this, collision.obj);
 						}
+						
+							
+						
 					});
 
 
@@ -968,13 +971,14 @@ var game = function () {
 				stage.insert(new Q.Spring({ x: 3650, y: 272 }));
 				stage.insert(new Q.Eggman({ x: 4090, y: 150 }));
 				//stage.insert(new Q.Shark({ x: 560, y: 350 }));*/
-				stage.insert(new Q.Spring({ x: 4930, y: 272 }));
 				//stage.insert(new Q.Shark({ x: 2850, y: 100 }));
 
 				stage.insert(new Q.Coin({x: 1830, y: 50}));
 				stage.insert(new Q.Coin({x: 1880, y: 50}));
 				stage.insert(new Q.Coin({x: 1930, y: 50}));
 				stage.insert(new Q.Coin({x: 1980, y: 50}));
+
+				stage.insert(new Q.Spring({ x: 4930, y: 272 }));
 
 				stage.insert(new Q.Shark({ x: 1720, y: 100 }));
 				stage.insert(new Q.Shark({ x: 2250, y: 100 }));
