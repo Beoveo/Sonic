@@ -1,0 +1,13 @@
+Se han realizado las siguientes modificaciones:
+
+- Movimiento del tiburón: Hace su función de plataforma para Sonic.
+- Arreglos del mapa: 
+  Ya no encuentra bloques invisibles y por lo tanto Sonic salta a su altura normal
+  y podemos colocar los elementos en la coordenada y que queramos.
+  También se ha incluido el looping y algunas zonas altas, para ver el funcionamiento del tiburón.
+
+- Movimiento de Sonic en el looping: Hace el looping de forma automática cuando detecta que está en el looping.
+- Velocidad de Sonic: Se ha limitado para que no haya bugs.
+- Fondo de juego: Se ha incluido un fondo que se muestra en la ventana de fondo a la hora de jugar.
+
+
