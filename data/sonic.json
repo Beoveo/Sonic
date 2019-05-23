@@ -1,6 +1,0 @@
-{
-	"sonicR":{"sx": 0, "sy": 0, "tileW": 43, "tileH": 40, "frames": 7 },
-	"sonicS":{"sx": 559, "sy": 0, "tileW": 43, "tileH": 40, "frames": 8},
-	"sonicJump":{"sx": 301, "sy": 0, "tileW": 43, "tileH": 40, "frames": 6},
-	"sonicDown":{"sx": 903, "sy": 0, "tileW": 43, "tileH": 40, "frames": 3}
-}
