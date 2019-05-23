@@ -1,4 +1,0 @@
-pinguino: 24x30
-daemon: 25x28
-shark: 52x55
-clown: 44x62
